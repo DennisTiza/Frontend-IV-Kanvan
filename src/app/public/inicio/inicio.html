@@ -1,0 +1,93 @@
+<section id="login-page" class="login-page">
+  <div class="login-card">
+    <div class="left-panel">
+      <div class="overlay"></div>
+
+      <div class="content">
+        <div class="logo-bar"></div>
+
+        <h1>KANVAN IV</h1>
+
+        <p>
+          Plataforma integral para la monitorización de procesos,
+          control de producción y administración de personal de VATOVI S.A.S.
+        </p>
+      </div>
+
+      <div class="bottom-info">
+        <div class="icon-box" aria-hidden="true">
+          ⚙
+        </div>
+
+        <span>Sistema de Control v1.0.0</span>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <form class="form-box" [formGroup]="fGroup" (ngSubmit)="IdentificarUsuario()" novalidate>
+        <h2>Iniciar Sesión</h2>
+
+        <p class="subtitle">
+          Ingrese sus credenciales para acceder al sistema.
+        </p>
+
+        <div class="field">
+          <label for="usuario">Correo Electrónico</label>
+          <input
+            id="usuario"
+            type="email"
+            formControlName="usuario"
+            placeholder="usuario@vatovi.com.co"
+            autocomplete="username"
+            [attr.aria-invalid]="obtenerFormGroup['usuario'].invalid && (obtenerFormGroup['usuario'].dirty || obtenerFormGroup['usuario'].touched)"
+          >
+
+          @if (obtenerFormGroup['usuario'].errors && (obtenerFormGroup['usuario'].dirty || obtenerFormGroup['usuario'].touched)) {
+            <div class="show-errors">
+              Este campo es obligatorio y debe tener el formato de correo electrónico.
+            </div>
+          }
+        </div>
+
+        <div class="field">
+          <label for="clave">Contraseña</label>
+
+          <div class="password-box">
+            <input
+              id="clave"
+              [type]="mostrarClave() ? 'text' : 'password'"
+              formControlName="clave"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              [attr.aria-invalid]="obtenerFormGroup['clave'].invalid && (obtenerFormGroup['clave'].dirty || obtenerFormGroup['clave'].touched)"
+            >
+
+            <button
+              type="button"
+              class="password-toggle"
+              (click)="alternarClave()"
+              [attr.aria-label]="mostrarClave() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+              [attr.aria-pressed]="mostrarClave()"
+            >
+              {{ mostrarClave() ? '🙈' : '👁' }}
+            </button>
+          </div>
+
+          @if (obtenerFormGroup['clave'].errors && (obtenerFormGroup['clave'].dirty || obtenerFormGroup['clave'].touched)) {
+            <div class="show-errors">
+              Este campo es obligatorio.
+            </div>
+          }
+        </div>
+
+        <button type="submit" class="submit-button" [disabled]="fGroup.invalid">
+          Iniciar Sesión →
+        </button>
+
+        <div class="footer">
+          © 2024 KanvanIV. Todos los derechos reservados.
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

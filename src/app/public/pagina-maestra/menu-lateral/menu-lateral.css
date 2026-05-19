@@ -1,0 +1,158 @@
+:host {
+	display: block;
+	font-family: 'Inter', sans-serif;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+.sidebar {
+	width: 280px;
+	height: 100vh;
+	background: #001b4d;
+	display: flex;
+	flex-direction: column;
+	padding: 28px 18px;
+	position: fixed;
+	left: 0;
+	top: 0;
+	overflow: hidden;
+	transform: translateX(-100%);
+	transition: transform 0.16s ease;
+	z-index: 1100;
+}
+
+.sidebar.open {
+	transform: translateX(0);
+}
+
+.sidebar-backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(4, 17, 36, 0.45);
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.16s ease;
+	z-index: 1090;
+}
+
+.sidebar-backdrop.open {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.sidebar::before {
+	content: '';
+	position: absolute;
+	width: 300px;
+	height: 300px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.03);
+	top: -150px;
+	left: -150px;
+}
+
+.sidebar::after {
+	content: '';
+	position: absolute;
+	width: 380px;
+	height: 380px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.02);
+	bottom: -220px;
+	right: -220px;
+}
+
+.sidebar-header {
+	position: relative;
+	z-index: 2;
+	padding: 0 12px;
+	margin-bottom: 40px;
+}
+
+.sidebar-header h1 {
+	color: #ffffff;
+	font-size: 24px;
+	font-weight: 700;
+	margin-bottom: 6px;
+}
+
+.sidebar-header p {
+	color: #8ea6cf;
+	font-size: 13px;
+}
+
+.sidebar-menu {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	position: relative;
+	z-index: 2;
+}
+
+.menu-item {
+	width: 100%;
+	height: 54px;
+	border-radius: 14px;
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 0 18px;
+	text-decoration: none;
+	color: #b8c7df;
+	font-size: 15px;
+	font-weight: 500;
+	transition: background-color 0.15s ease, color 0.15s ease;
+	background: transparent;
+	border: none;
+	text-align: left;
+	cursor: pointer;
+}
+
+.icon {
+	font-size: 20px;
+	width: 22px;
+	display: flex;
+	justify-content: center;
+}
+
+.menu-item:hover,
+.menu-item:focus-visible {
+	background: rgba(255, 255, 255, 0.08);
+	color: #ffffff;
+}
+
+.menu-item.active {
+	background: #1e5bb8;
+	color: #ffffff;
+	box-shadow: 0 10px 20px rgba(30, 91, 184, 0.35);
+}
+
+.sidebar-footer {
+	margin-top: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	position: relative;
+	z-index: 2;
+}
+
+.logout {
+	color: #ff9b9b;
+}
+
+.logout:hover,
+.logout:focus-visible {
+	background: rgba(255, 80, 80, 0.12);
+	color: #ffb4b4;
+}
+
+@media (max-width: 960px) {
+	.sidebar {
+		width: 280px;
+		height: 100vh;
+	}
+}

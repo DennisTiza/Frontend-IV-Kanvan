@@ -1,0 +1,23 @@
+<header class="top-header">
+	<div class="header-left">
+		<button class="menu-btn" type="button" aria-label="Abrir menu lateral" (click)="abrirMenu()">
+			☰
+		</button>
+
+		<div class="header-title">
+			<h2>{{ tituloModulo() }}</h2>
+			<p>Gestión industrial y monitoreo</p>
+		</div>
+	</div>
+
+	<div class="header-right">
+		<div class="user-box">
+			<div class="user-info">
+				<span class="user-name">{{ nombreUsuario() }}</span>
+				<span class="user-role">{{ rolUsuario() }}</span>
+			</div>
+
+			<div class="user-avatar" aria-hidden="true">👤</div>
+		</div>
+	</div>
+</header>

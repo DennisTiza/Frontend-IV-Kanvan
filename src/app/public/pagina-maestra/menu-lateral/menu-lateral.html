@@ -1,0 +1,35 @@
+<div
+	class="sidebar-backdrop"
+	[class.open]="abierto()"
+	(click)="seleccionarMenu()"
+	aria-hidden="true"
+></div>
+
+<aside class="sidebar" [class.open]="abierto()" aria-label="Menu lateral principal">
+	<div class="sidebar-header">
+		<h1>VATOVI S.A.S.</h1>
+		<p>Gestión Industrial</p>
+	</div>
+
+	<nav class="sidebar-menu" aria-label="Opciones de navegación">
+		@for (menu of listaMenus(); track menu.ruta) {
+			<a
+				class="menu-item"
+				[routerLink]="menu.ruta || '/seguridad/usuario'"
+				routerLinkActive="active"
+				[routerLinkActiveOptions]="{ exact: true }"
+				(click)="seleccionarMenu()"
+			>
+				<span class="icon" aria-hidden="true">{{ obtenerIcono(menu.texto) }}</span>
+				<span>{{ menu.texto }}</span>
+			</a>
+		}
+	</nav>
+
+	<div class="sidebar-footer">
+		<button class="menu-item menu-action logout" type="button" (click)="cerrarSesion()">
+			<span class="icon" aria-hidden="true">•</span>
+			<span>Cerrar Sesión</span>
+		</button>
+	</div>
+</aside>
