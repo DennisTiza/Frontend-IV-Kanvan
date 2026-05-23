@@ -8,7 +8,7 @@ import { cambiarClavemodel } from '../models/cambiarClave.model';
 import { RolModel } from '../models/rol.model';
 import { PermisoModel } from '../models/permiso.model';
 import { ConfiguracionMenu } from '../config/configuracion.menu';
-import { ItemMenuModel} from '../models/itemMenu.model';
+import { ItemMenuModel } from '../models/itemMenu.model';
 
 @Injectable({
   providedIn: 'root'
@@ -101,32 +101,32 @@ export class SeguridadService {
 
 
   ConstruirMenu(permisos: PermisoModel[]) {
-  let menu: ItemMenuModel[] = [];
+    let menu: ItemMenuModel[] = [];
 
-  permisos.forEach((permiso) => {
-    let datosRuta = ConfiguracionMenu.listaMenus
-      .filter(x => 
-        x.id == permiso.menuId && permiso[x.accion as keyof PermisoModel]
-      );
+    permisos.forEach((permiso) => {
+      let datosRuta = ConfiguracionMenu.listaMenus
+        .filter(x =>
+          x.id == permiso.menuId && permiso[x.accion as keyof PermisoModel]
+        );
 
-    if (datosRuta.length > 0) {
-      let item = new ItemMenuModel();
-      item.idMenu = permiso.menuId;
-      item.ruta = datosRuta[0].ruta;
-      item.texto = datosRuta[0].texto;
+      if (datosRuta.length > 0) {
+        let item = new ItemMenuModel();
+        item.idMenu = permiso.menuId;
+        item.ruta = datosRuta[0].ruta;
+        item.titulo = datosRuta[0].titulo;
 
-      menu.push(item);
-    }
-  });
+        menu.push(item);
+      }
+    });
 
-  this.AlmacenarItemsMenu(menu);
-}
+    this.AlmacenarItemsMenu(menu);
+  }
 
   AlmacenarItemsMenu(items: ItemMenuModel[]) {
     let menuString = JSON.stringify(items);
     localStorage.setItem("menu-lateral", menuString);
   }
-  
+
   ObtenerItemsMenu(): ItemMenuModel[] {
     let menu: ItemMenuModel[] = [];
     let menuString = localStorage.getItem("menu-lateral");
@@ -153,11 +153,10 @@ export class SeguridadService {
     console.log(datos);
 
     return this.http.post<UsuarioModel>(`${this.urlBase}usuario`, {
-      Nombre: datos.Nombre,
-      Telefono: datos.Telefono,
-      Apellido: datos.Apellido,
-      Clave: datos.Clave,
-      Correo: datos.Correo,
+      nombre: datos.nombre,
+      apellido: datos.apellido,
+      clave: datos.clave,
+      correo: datos.correo,
       rolId: datos.rolId
     })
       .pipe(
@@ -187,7 +186,7 @@ export class SeguridadService {
   EditarUsuario(id: number, datos: any): Observable<any> {
     console.log(datos);
     try {
-      return this.http.put<any>(`${this.urlBase}usuario/${id}`, datos);
+      return this.http.patch<any>(`${this.urlBase}usuario/${id}`, datos);
     } catch (error) {
       console.error('Error al editar el usuario:', error);
       return throwError(() => error);
@@ -203,7 +202,7 @@ export class SeguridadService {
     return this.http.get<RolModel[]>(`${this.urlBase}rol`);
   }
 
-  ObtenerTokenLocalStorage():string {
+  ObtenerTokenLocalStorage(): string {
     let ls = localStorage.getItem("datos-sesion");
     if (ls) {
       let usuario: UsuarioValidadoModel = JSON.parse(ls);

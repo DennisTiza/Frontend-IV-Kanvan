@@ -1,0 +1,23 @@
+<div class="pagination-container">
+    <span class="pagination-info">
+        Mostrando {{ inicioRegistro }} al {{ registrosMostrados }} de {{ totalRegistros }} {{ nombreEntidad }}
+    </span>
+
+    <div class="pagination-buttons">
+        <button 
+            type="button"
+            class="pagination-btn" 
+            [disabled]="paginaActual === 1" 
+            (click)="irPagina(paginaActual - 1)">
+            Anterior
+        </button>
+
+        <button 
+            type="button"
+            class="pagination-btn" 
+            [disabled]="paginaActual >= totalPaginas || totalPaginas === 0" 
+            (click)="irPagina(paginaActual + 1)">
+            Siguiente
+        </button>
+    </div>
+</div>

@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { Inicio } from './public/inicio/inicio';
 import { ValidarSesionInactivaGuard } from './guard/validar-sesion-inactiva.guard';
 import { ValidarSesionActivaGuard } from './guard/validar-sesion-activa.guard';
-import { Usuario } from './modules/seguridad/usuario/usuario';
+import { CrearUsuario } from './modules/seguridad/usuario/crear-usuario/crear-usuario';
 
 export const routes: Routes = [
     {
@@ -16,12 +16,12 @@ export const routes: Routes = [
         canActivate: [ValidarSesionInactivaGuard]
     },
     {
-        path: 'seguridad/usuario',
-        component: Usuario,
+        path: 'seguridad/crear-usuario',
+        component: CrearUsuario,
         canActivate: [ValidarSesionActivaGuard]
     },
     {
         path: '**',
-        redirectTo: 'inicio'
+        redirectTo: 'seguridad/crear-usuario'
     }
 ];

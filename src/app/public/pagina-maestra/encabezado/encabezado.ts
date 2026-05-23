@@ -4,6 +4,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { filter, map, startWith } from 'rxjs/operators';
 import { SeguridadService } from '../../../services/seguridad.service';
 import { UsuarioValidadoModel } from '../../../models/usuario.validado.model';
+import { ConfiguracionMenu } from '../../../config/configuracion.menu';
 
 @Component({
   selector: 'app-encabezado',
@@ -31,6 +32,11 @@ export class Encabezado {
     { initialValue: new UsuarioValidadoModel() }
   );
 
+  private readonly roles = toSignal(
+    this.servicioSeguridad.ObtenerRoles(),
+    { initialValue: [] }
+  );
+
   protected readonly nombreUsuario = computed(() => {
     const usuario = this.sesion().user;
     if (!usuario) {
@@ -38,26 +44,21 @@ export class Encabezado {
     }
 
     const nombreCompleto = `${usuario.nombre ?? ''} ${usuario.apellido ?? ''}`.trim();
-    return nombreCompleto || usuario.correo || 'Usuario';
+    return nombreCompleto;
   });
 
   protected readonly rolUsuario = computed(() => {
-    const rol = this.sesion().user?.rol;
-    return rol || 'Operario';
+    const rolId = this.sesion().user?.rolId;
+    const rolEncontrado = this.roles().find(r => r.id === rolId);
+    return rolEncontrado?.Nombre;
   });
 
   protected readonly tituloModulo = computed(() => {
     const ruta = this.rutaActual();
-
-    if (ruta.includes('/seguridad/usuario')) {
-      return 'Gestión Usuarios';
-    }
-
-    if (ruta.includes('/inicio')) {
-      return 'Inicio';
-    }
-
-    return 'Panel Principal';
+    const menuEncontrado = ConfiguracionMenu.listaMenus.find(menu =>
+      ruta.includes(menu.ruta)
+    );
+    return menuEncontrado?.titulo;
   });
 
   protected abrirMenu(): void {

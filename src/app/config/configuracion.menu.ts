@@ -2,9 +2,9 @@ export namespace ConfiguracionMenu {
     export const listaMenus = [
         {
             id: "1",
-            ruta: "/seguridad/usuario",
-            texto:"Usuarios",
-            accion: "Guardar"
-        }
+            ruta: "/seguridad/crear-usuario",
+            accion: "Guardar",
+            titulo: "Usuarios"
+        },
     ];
 }

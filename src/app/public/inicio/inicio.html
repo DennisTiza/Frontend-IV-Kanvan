@@ -10,7 +10,7 @@
 
         <p>
           Plataforma integral para la monitorización de procesos,
-          control de producción y administración de personal de VATOVI S.A.S.
+          control de producción y administración de personal.
         </p>
       </div>
 
@@ -19,7 +19,7 @@
           ⚙
         </div>
 
-        <span>Sistema de Control v1.0.0</span>
+        <span>Sistema de Control de Procesos v1.0.0</span>
       </div>
     </div>
 
@@ -33,19 +33,15 @@
 
         <div class="field">
           <label for="usuario">Correo Electrónico</label>
-          <input
-            id="usuario"
-            type="email"
-            formControlName="usuario"
-            placeholder="usuario@vatovi.com.co"
+          <input id="usuario" type="email" formControlName="usuario" placeholder="usuario@vatovi.com.co"
             autocomplete="username"
-            [attr.aria-invalid]="obtenerFormGroup['usuario'].invalid && (obtenerFormGroup['usuario'].dirty || obtenerFormGroup['usuario'].touched)"
-          >
+            [attr.aria-invalid]="obtenerFormGroup['usuario'].invalid && (obtenerFormGroup['usuario'].dirty || obtenerFormGroup['usuario'].touched)">
 
-          @if (obtenerFormGroup['usuario'].errors && (obtenerFormGroup['usuario'].dirty || obtenerFormGroup['usuario'].touched)) {
-            <div class="show-errors">
-              Este campo es obligatorio y debe tener el formato de correo electrónico.
-            </div>
+          @if (obtenerFormGroup['usuario'].errors && (obtenerFormGroup['usuario'].dirty ||
+          obtenerFormGroup['usuario'].touched)) {
+          <div class="show-errors">
+            Este campo es obligatorio y debe tener el formato de correo electrónico.
+          </div>
           }
         </div>
 
@@ -53,30 +49,36 @@
           <label for="clave">Contraseña</label>
 
           <div class="password-box">
-            <input
-              id="clave"
-              [type]="mostrarClave() ? 'text' : 'password'"
-              formControlName="clave"
-              placeholder="••••••••"
-              autocomplete="current-password"
-              [attr.aria-invalid]="obtenerFormGroup['clave'].invalid && (obtenerFormGroup['clave'].dirty || obtenerFormGroup['clave'].touched)"
-            >
+            <input id="clave" [type]="mostrarClave() ? 'text' : 'password'" formControlName="clave"
+              placeholder="••••••••" autocomplete="current-password"
+              [attr.aria-invalid]="obtenerFormGroup['clave'].invalid && (obtenerFormGroup['clave'].dirty || obtenerFormGroup['clave'].touched)">
 
-            <button
-              type="button"
-              class="password-toggle"
-              (click)="alternarClave()"
+            <button type="button" class="password-toggle" (click)="alternarClave()"
               [attr.aria-label]="mostrarClave() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
-              [attr.aria-pressed]="mostrarClave()"
-            >
-              {{ mostrarClave() ? '🙈' : '👁' }}
+              [attr.aria-pressed]="mostrarClave()">
+              @if (mostrarClave()) {
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+                <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+                <line x1="2" y1="2" x2="22" y2="22" />
+              </svg>
+              }
             </button>
           </div>
 
-          @if (obtenerFormGroup['clave'].errors && (obtenerFormGroup['clave'].dirty || obtenerFormGroup['clave'].touched)) {
-            <div class="show-errors">
-              Este campo es obligatorio.
-            </div>
+          @if (obtenerFormGroup['clave'].errors && (obtenerFormGroup['clave'].dirty ||
+          obtenerFormGroup['clave'].touched)) {
+          <div class="show-errors">
+            Este campo es obligatorio.
+          </div>
           }
         </div>
 
@@ -85,7 +87,7 @@
         </button>
 
         <div class="footer">
-          © 2024 KanvanIV. Todos los derechos reservados.
+          © 2026 KanvanIV - Dennis Tisalema & Natalia Gallego. Todos los derechos reservados.
         </div>
       </form>
     </div>
