@@ -26,6 +26,14 @@ export class SeguridadService {
     });
   }
 
+  IdentificarUsuarioConRol(usuario: string, clave: string, rolIdSeleccionado: number): Observable<UsuarioValidadoModel> {
+    return this.http.post<UsuarioValidadoModel>(`${this.urlBase}identificar-usuario`, {
+      correo: usuario,
+      clave: clave,
+      rolIdSeleccionado: rolIdSeleccionado
+    });
+  }
+
 
   RecuperarClavePorUsuario(usuario: string): Observable<UsuarioModel> {
     return this.http.post<UsuarioModel>(`${this.urlBase}recuperar-clave`, {

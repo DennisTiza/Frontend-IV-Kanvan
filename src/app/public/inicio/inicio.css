@@ -245,6 +245,71 @@
     line-height: 1.4;
 }
 
+/* Selector de Perfiles y Botones de Rol */
+.role-selector-buttons {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.role-btn {
+    flex: 1;
+    height: 48px;
+    border: 1px solid #d8dde6;
+    border-radius: 10px;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.role-btn:hover {
+    border-color: #0c2d63;
+    background: #edf2f7;
+    color: #0c2d63;
+    transform: translateY(-1px);
+}
+
+.role-btn.active {
+    background: linear-gradient(135deg, #0c2d63 0%, #001b4d 100%);
+    border-color: #0c2d63;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(12, 45, 99, 0.2);
+    transform: translateY(0);
+}
+
+/* Selector Dropdown de Nombres */
+.field select {
+    width: 100%;
+    height: 52px;
+    border: 1px solid #d8dde6;
+    border-radius: 10px;
+    padding: 0 18px;
+    font-size: 15px;
+    background: #f8fafc;
+    color: #1d2b45;
+    outline: none;
+    transition: 0.3s;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 18px center;
+    background-size: 16px;
+    cursor: pointer;
+}
+
+.field select:focus {
+    border-color: #0c2d63;
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(12, 45, 99, 0.08);
+}
+
 @media (max-width: 960px) {
     .login-page {
         padding: 16px;
@@ -291,6 +356,11 @@
 
     .field input {
         height: 50px;
+    }
+
+    .role-selector-buttons {
+        flex-direction: column;
+        gap: 8px;
     }
 
     .submit-button {

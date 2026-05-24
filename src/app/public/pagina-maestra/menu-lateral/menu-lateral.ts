@@ -20,9 +20,16 @@ export class MenuLateral {
 
   protected readonly listaMenus = computed(() => {
     const menus = this.menuDinamico();
+    const usuarioLogueado = this.servicioSeguridad.ObtenerDatosUsuarioIdentificado();
 
     if (menus.length > 0) {
-      return menus;
+      return menus.filter(menu => {
+        // Restringir el menú de Reportes únicamente a Gerencia (Rol 3)
+        if (menu.ruta === '/reportes') {
+          return usuarioLogueado && usuarioLogueado.rolId === 3;
+        }
+        return true;
+      });
     }
     return null;
   });

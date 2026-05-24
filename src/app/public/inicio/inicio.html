@@ -28,49 +28,83 @@
         <h2>Iniciar Sesión</h2>
 
         <p class="subtitle">
-          Ingrese sus credenciales para acceder al sistema.
+          Seleccione su perfil de ingreso para acceder al sistema.
         </p>
 
+        <!-- 1. Botones de Selección de Perfil -->
         <div class="field">
-          <label for="usuario">Correo Electrónico</label>
-          <input id="usuario" type="email" formControlName="usuario" placeholder="usuario@vatovi.com.co"
-            autocomplete="username"
-            [attr.aria-invalid]="obtenerFormGroup['usuario'].invalid && (obtenerFormGroup['usuario'].dirty || obtenerFormGroup['usuario'].touched)">
-
-          @if (obtenerFormGroup['usuario'].errors && (obtenerFormGroup['usuario'].dirty ||
-          obtenerFormGroup['usuario'].touched)) {
-          <div class="show-errors">
-            Este campo es obligatorio y debe tener el formato de correo electrónico.
+          <label>Perfil</label>
+          <div class="role-selector-buttons">
+            <button
+              type="button"
+              class="role-btn"
+              [class.active]="rolSeleccionado === 2"
+              (click)="seleccionarPerfil(2)"
+            >
+              👷 Operario
+            </button>
+            <button
+              type="button"
+              class="role-btn"
+              [class.active]="rolSeleccionado === 1"
+              (click)="seleccionarPerfil(1)"
+            >
+              💼 Administrador
+            </button>
+            <button
+              type="button"
+              class="role-btn"
+              [class.active]="rolSeleccionado === 3"
+              (click)="seleccionarPerfil(3)"
+            >
+              👑 Gerencia
+            </button>
           </div>
-          }
         </div>
 
+        <!-- 2. Selector de Nombre (Solo se muestra para Gerentes) -->
+        @if (rolSeleccionado === 3) {
+          <div class="field">
+            <label for="usuarioSelect">Seleccione su Nombre</label>
+            <select id="usuarioSelect" formControlName="usuario">
+              <option value="" disabled selected>Elija su nombre...</option>
+              @for (u of usuariosFiltrados; track u.id) {
+                <option [value]="u.correo">
+                  {{ u.nombre }} {{ u.apellido }}
+                </option>
+              }
+            </select>
+
+            @if (obtenerFormGroup['usuario'].errors && (obtenerFormGroup['usuario'].dirty || obtenerFormGroup['usuario'].touched)) {
+              <div class="show-errors">
+                Por favor, seleccione su nombre de la lista.
+              </div>
+            }
+          </div>
+        }
+
+        <!-- 3. Campo de Contraseña -->
         <div class="field">
           <label for="clave">Contraseña</label>
 
           <div class="password-box">
-            <input id="clave" [type]="mostrarClave() ? 'text' : 'password'" formControlName="clave"
-              placeholder="••••••••" autocomplete="current-password"
-              [attr.aria-invalid]="obtenerFormGroup['clave'].invalid && (obtenerFormGroup['clave'].dirty || obtenerFormGroup['clave'].touched)">
+            <input
+              id="clave"
+              [type]="mostrarClave() ? 'text' : 'password'"
+              formControlName="clave"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              [attr.aria-invalid]="obtenerFormGroup['clave'].invalid && (obtenerFormGroup['clave'].dirty || obtenerFormGroup['clave'].touched)"
+            >
 
-            <button type="button" class="password-toggle" (click)="alternarClave()"
+            <button
+              type="button"
+              class="password-toggle"
+              (click)="alternarClave()"
               [attr.aria-label]="mostrarClave() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
-              [attr.aria-pressed]="mostrarClave()">
-              @if (mostrarClave()) {
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-              } @else {
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
-                <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
-                <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
-                <line x1="2" y1="2" x2="22" y2="22" />
-              </svg>
-              }
+              [attr.aria-pressed]="mostrarClave()"
+            >
+              {{ mostrarClave() ? '🙈' : '👁' }}
             </button>
           </div>
 
