@@ -1,9 +1,4 @@
-<div
-	class="sidebar-backdrop"
-	[class.open]="abierto()"
-	(click)="seleccionarMenu()"
-	aria-hidden="true"
-></div>
+<div class="sidebar-backdrop" [class.open]="abierto()" (click)="seleccionarMenu()" aria-hidden="true"></div>
 
 <aside class="sidebar" [class.open]="abierto()" aria-label="Menu lateral principal">
 	<div class="sidebar-header">
@@ -13,22 +8,17 @@
 
 	<nav class="sidebar-menu" aria-label="Opciones de navegación">
 		@for (menu of listaMenus(); track menu.ruta) {
-			<a
-				class="menu-item"
-				[routerLink]="menu.ruta || '/seguridad/usuario'"
-				routerLinkActive="active"
-				[routerLinkActiveOptions]="{ exact: true }"
-				(click)="seleccionarMenu()"
-			>
-				<span class="icon" aria-hidden="true">{{ obtenerIcono(menu.titulo) }}</span>
-				<span>{{ menu.titulo }}</span>
-			</a>
+		<a class="menu-item" [routerLink]="menu.ruta" routerLinkActive="active"
+			[routerLinkActiveOptions]="{ exact: true }" (click)="seleccionarMenu()">
+			<span class="icon" aria-hidden="true">{{ obtenerIcono(menu.titulo) }}</span>
+			<span>{{ menu.titulo}}</span>
+		</a>
 		}
 	</nav>
 
 	<div class="sidebar-footer">
 		<button class="menu-item menu-action logout" type="button" (click)="cerrarSesion()">
-			<span class="icon" aria-hidden="true">•</span>
+			<span class="icon" aria-hidden="true">←</span>
 			<span>Cerrar Sesión</span>
 		</button>
 	</div>

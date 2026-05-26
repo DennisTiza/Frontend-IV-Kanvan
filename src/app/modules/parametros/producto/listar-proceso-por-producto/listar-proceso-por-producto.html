@@ -1,0 +1,115 @@
+<section class="table-card">
+
+  <!-- HEADER -->
+  <div class="table-header">
+    <div>
+      <h2 class="section-title">Secuencia de Procesos</h2>
+      <p class="table-subtitle">
+        @if (productoNombre) {
+        Ruta de manufactura para <strong>{{ productoNombre }}</strong>.
+        } @else {
+        Guarde el producto primero para gestionar sus procesos.
+        }
+      </p>
+    </div>
+
+    <button class="add-btn" [disabled]="!productoId" [class.add-btn-disabled]="!productoId"
+      (click)="abrirModalAgregar()">
+      <!-- Icono add (SVG inline) -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <line x1="5" y1="12" x2="19" y2="12" />
+      </svg>
+      Agregar Proceso
+    </button>
+  </div>
+
+  <!-- TABLA -->
+  <div class="table-container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Orden</th>
+          <th>Proceso</th>
+          <th class="center">Lote</th>
+          <th class="right">Tiempo / Lote</th>
+          <th class="right">Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @if (procesos.length === 0) {
+        <tr>
+          <td colspan="5" class="empty-state">
+            <!-- Icono inbox (SVG inline) -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="empty-icon" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" />
+              <path
+                d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
+            </svg>
+            <p>{{ productoId ? 'No hay procesos registrados para este producto.' : 'Guarde el producto para agregar
+              procesos.' }}
+            </p>
+          </td>
+        </tr>
+        }
+
+        @for (item of procesos; track item.id; let i = $index) {
+        <tr>
+          <!-- Orden -->
+          <td>
+            <span class="order-badge">
+              {{ (i + 1).toString().padStart(2, '0') }}
+            </span>
+          </td>
+
+          <!-- Proceso -->
+          <td>
+            <p class="process-title">{{ obtenerNombreProceso(item.idProceso) }}</p>
+            <p class="process-subtitle">{{ obtenerCodigoProceso(item.idProceso) }}</p>
+          </td>
+
+          <!-- Lote -->
+          <td class="center">{{ item.cantidad ?? '—' }}</td>
+
+          <!-- Tiempo -->
+          <td class="right">
+            <div class="time-box">
+              <!-- Icono schedule/reloj (SVG inline) -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+              <span>{{ item.tiempo ?? '—' }} min</span>
+            </div>
+          </td>
+
+          <!-- Acciones -->
+          <td class="right">
+            <button class="delete-btn" (click)="eliminarProcesoXProducto(item.id)" title="Eliminar proceso">
+              <!-- Icono delete (SVG inline) -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                <line x1="10" y1="11" x2="10" y2="17" />
+                <line x1="14" y1="11" x2="14" y2="17" />
+              </svg>
+            </button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+</section>
+
+<!-- MODAL: AGREGAR PROCESO -->
+@if (mostrarModalAgregar) {
+<app-agregar-proceso [productoId]="productoId" (cerrado)="onModalCerrado()" (procesoAgregado)="onProcesoAgregado()">
+</app-agregar-proceso>
+}

@@ -1,0 +1,213 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* CARD */
+.table-card {
+  background: white;
+  border: 1px solid #c4c6d0;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* HEADER */
+.table-header {
+  padding: 24px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #6b7280;
+  margin: 0 0 6px 0;
+}
+
+.table-subtitle {
+  color: #6b7280;
+  font-size: 13px;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+/* BOTÓN AGREGAR */
+.add-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #1e5bb8;
+  background: white;
+  color: #1e5bb8;
+  padding: 10px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  transition: background 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.add-btn:hover:not(:disabled) {
+  background: #eff6ff;
+}
+
+.add-btn-disabled {
+  border-color: #c4c6d0;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* TABLA */
+.table-container {
+  max-height: 540px;
+  overflow-y: auto;
+  overflow-x: auto;
+  flex: 1;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Inter', sans-serif;
+}
+
+.table thead {
+  background: #f1f4f6;
+}
+
+.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #f1f4f6;
+}
+
+.table th {
+  padding: 14px 24px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6b7280;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 16px 24px;
+  border-top: 1px solid #f1f1f1;
+  font-size: 14px;
+  color: #181c1e;
+}
+
+.table tbody tr {
+  transition: background 0.15s;
+}
+
+.table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.center {
+  text-align: center;
+}
+
+.right {
+  text-align: right;
+}
+
+/* ORDER BADGE */
+.order-badge {
+  width: 34px;
+  height: 34px;
+  background: #eff6ff;
+  color: #1e5bb8;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+/* PROCESO */
+.process-title {
+  margin: 0;
+  font-weight: 600;
+  color: #181c1e;
+}
+
+.process-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* TIEMPO */
+.time-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #1e5bb8;
+  font-weight: 500;
+}
+
+.icon-small {
+  font-size: 18px;
+}
+
+/* DELETE */
+.delete-btn {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+}
+
+.delete-btn:hover {
+  color: #ba1a1a;
+  background: rgba(186, 26, 26, 0.08);
+}
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px !important;
+  color: #9ca3af;
+}
+
+.empty-icon {
+  font-size: 48px;
+  display: block;
+  margin: 0 auto 12px;
+  color: #c4c6d0;
+  width: 40px;
+  height: 40px;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 14px;
+}

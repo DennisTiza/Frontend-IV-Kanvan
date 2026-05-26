@@ -112,8 +112,8 @@ export class SeguridadService {
       if (datosRuta.length > 0) {
         let item = new ItemMenuModel();
         item.idMenu = permiso.menuId;
-        item.ruta = datosRuta[0].ruta;
         item.titulo = datosRuta[0].titulo;
+        item.ruta = datosRuta[0].ruta;
 
         menu.push(item);
       }

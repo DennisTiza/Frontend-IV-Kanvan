@@ -35,6 +35,10 @@ export class MenuLateral {
     return '•';
   }
 
+  protected obtenerTitulo(texto?: string): string {
+    return texto || '';
+  }
+
   protected cerrarSesion() {
     this.servicioSeguridad.RemoverDatosUsuarioValidado();
     this.router.navigate(['/inicio']);

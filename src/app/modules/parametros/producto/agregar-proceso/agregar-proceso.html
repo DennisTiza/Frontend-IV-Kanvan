@@ -1,0 +1,108 @@
+<div class="modal-overlay" (click)="cerrarAlFondo($event)">
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+
+    <!-- HEADER -->
+    <div class="modal-header">
+      <div>
+        <h3 class="modal-title" id="modal-title">Agregar Proceso</h3>
+        <p class="modal-subtitle">Asocie un proceso a la secuencia de manufactura del producto.</p>
+      </div>
+      <button class="close-btn" (click)="cerrar()" aria-label="Cerrar modal">
+        <!-- Icono close (SVG inline) -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- FORMULARIO -->
+    <form [formGroup]="procesoForm" (ngSubmit)="guardar()" class="modal-body">
+
+      <!-- Proceso -->
+      <div class="form-group">
+        <label class="label" for="idProceso">Proceso</label>
+        <select
+          id="idProceso"
+          formControlName="idProceso"
+          class="input"
+          [class.input-error]="procesoForm.get('idProceso')?.invalid && procesoForm.get('idProceso')?.touched">
+          <option value="" disabled selected>Seleccione un proceso...</option>
+          @for (proceso of listaProcesos; track proceso.id) {
+            <option [value]="proceso.id">{{ proceso.nombre }} ({{ proceso.codigo }})</option>
+          }
+        </select>
+        @if (procesoForm.get('idProceso')?.invalid && procesoForm.get('idProceso')?.touched) {
+          <span class="error-msg">Seleccione un proceso.</span>
+        }
+      </div>
+
+      <!-- Cantidad por lote -->
+      <div class="form-group">
+        <label class="label" for="cantidad">Cantidad por Lote</label>
+        <input
+          id="cantidad"
+          type="number"
+          formControlName="cantidad"
+          placeholder="Ej: 50"
+          min="1"
+          class="input"
+          [class.input-error]="procesoForm.get('cantidad')?.invalid && procesoForm.get('cantidad')?.touched"
+        />
+        @if (procesoForm.get('cantidad')?.invalid && procesoForm.get('cantidad')?.touched) {
+          <span class="error-msg">Ingrese una cantidad válida (mínimo 1).</span>
+        }
+      </div>
+
+      <!-- Tiempo por lote -->
+      <div class="form-group">
+        <label class="label" for="tiempo">Tiempo por Lote (min)</label>
+        <div class="input-with-icon">
+          <!-- Icono schedule/reloj (SVG inline) -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="input-icon" width="20" height="20" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          <input
+            id="tiempo"
+            type="number"
+            formControlName="tiempo"
+            placeholder="Ej: 120"
+            min="1"
+            class="input input-indented"
+            [class.input-error]="procesoForm.get('tiempo')?.invalid && procesoForm.get('tiempo')?.touched"
+          />
+        </div>
+        @if (procesoForm.get('tiempo')?.invalid && procesoForm.get('tiempo')?.touched) {
+          <span class="error-msg">Ingrese un tiempo válido en minutos (mínimo 1).</span>
+        }
+      </div>
+
+    </form>
+
+    <!-- FOOTER -->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="cerrar()">
+        Cancelar
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        [disabled]="procesoForm.invalid || cargando"
+        (click)="guardar()">
+        @if (cargando) {
+          <!-- Icono cargando (SVG inline animado) -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="spin" width="18" height="18" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+          </svg>
+        } @else {
+          Agregar Proceso
+        }
+      </button>
+    </div>
+
+  </div>
+</div>

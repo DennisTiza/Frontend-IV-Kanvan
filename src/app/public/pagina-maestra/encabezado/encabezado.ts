@@ -53,14 +53,6 @@ export class Encabezado {
     return rolEncontrado?.Nombre;
   });
 
-  protected readonly tituloModulo = computed(() => {
-    const ruta = this.rutaActual();
-    const menuEncontrado = ConfiguracionMenu.listaMenus.find(menu =>
-      ruta.includes(menu.ruta)
-    );
-    return menuEncontrado?.titulo;
-  });
-
   protected abrirMenu(): void {
     this.alternarMenu.emit();
   }
