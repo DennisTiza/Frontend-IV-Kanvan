@@ -49,7 +49,7 @@ export class Inicio {
         if (resp?.user && resp?.token) {
           this.servicioSeguridad.AlmacenarDatosUsuarioIdentificado(resp.user);
           this.servicioSeguridad.AlmacenarDatosUsuarioValidado(resp);
-          this.router.navigate(['/seguridad/crear-usuario']);
+          this.router.navigate([this.servicioSeguridad.ObtenerPrimerMenu()]);
         } else {
           alert('Usuario o clave incorrectos');
         }

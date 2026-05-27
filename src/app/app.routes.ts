@@ -5,6 +5,7 @@ import { ValidarSesionActivaGuard } from './guard/validar-sesion-activa.guard';
 import { CrearUsuario } from './modules/seguridad/usuario/crear-usuario/crear-usuario';
 import { CrearProducto } from './modules/parametros/producto/crear-producto/crear-producto';
 import { CrearProceso } from './modules/parametros/proceso/crear-proceso/crear-proceso';
+import { ListarTarjetaProduccion } from './modules/parametros/tarjeta-produccion/listar-tarjeta-produccion/listar-tarjeta-produccion';
 
 export const routes: Routes = [
     {
@@ -33,7 +34,12 @@ export const routes: Routes = [
         canActivate: [ValidarSesionActivaGuard]
     },
     {
+        path: 'parametros/tarjeta-produccion/listar-tarjeta-produccion',
+        component: ListarTarjetaProduccion,
+        canActivate: [ValidarSesionActivaGuard]
+    },
+    {
         path: '**',
-        redirectTo: 'seguridad/crear-usuario'
+        redirectTo: 'inicio'
     }
 ];

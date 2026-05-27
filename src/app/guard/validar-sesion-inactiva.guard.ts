@@ -23,7 +23,11 @@ export class ValidarSesionInactivaGuard implements CanActivate {
     if (existeSesion == null) {
       return true;
     }
-    return this.router.createUrlTree(["/seguridad/usuario"]);
+    let menu = this.servicioSeguridad.ObtenerItemsMenu();
+    if (menu.length === 0) {
+      return true;
+    }
+    return this.router.createUrlTree([this.servicioSeguridad.ObtenerPrimerMenu()]);
   }
 
 }

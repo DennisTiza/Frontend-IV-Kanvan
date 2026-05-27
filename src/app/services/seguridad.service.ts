@@ -136,6 +136,14 @@ export class SeguridadService {
     return menu;
   }
 
+  ObtenerPrimerMenu(): string {
+    let menu = this.ObtenerItemsMenu();
+    if (menu.length > 0 && menu[0].ruta) {
+      return menu[0].ruta;
+    }
+    return '/inicio';
+  }
+
   RemoverDatosUsuarioValidado() {
     let datosUsuario = localStorage.getItem("datos-usuario");
     let datosSesion = localStorage.getItem("datos-sesion");

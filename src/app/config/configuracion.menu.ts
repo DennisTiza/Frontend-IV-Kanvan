@@ -7,6 +7,12 @@ export namespace ConfiguracionMenu {
             accion: "Guardar"
         },
         {
+            id: "2",
+            titulo: "Tarjeta De Producción",
+            ruta: "/parametros/tarjeta-produccion/listar-tarjeta-produccion",
+            accion: "Listar"
+        },
+        {
             id: "3",
             titulo: "Productos",
             ruta: "/parametros/producto/crear-producto",
