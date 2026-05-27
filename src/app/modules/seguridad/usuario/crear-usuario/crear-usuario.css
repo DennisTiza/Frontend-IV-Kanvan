@@ -26,7 +26,7 @@
     font-size: 32px;
     font-weight: 700;
     margin-bottom: 8px;
-    color: #00163b;
+    color: #000000;
     margin-top: 0;
 }
 
@@ -56,7 +56,7 @@
 .card-header h3 {
     font-size: 22px;
     font-weight: 700;
-    color: #00163b;
+    color: #000000;
     margin: 0;
 }
 
@@ -101,8 +101,8 @@
 
 .form-group input:focus,
 .form-group select:focus {
-    border-color: #1e5bb8;
-    box-shadow: 0 0 0 3px rgba(30, 91, 184, 0.15);
+    border-color: #b70619;
+    box-shadow: 0 0 0 3px rgba(183, 6, 25, 0.15);
 }
 
 /* PASSWORD */
@@ -152,16 +152,16 @@
 }
 
 .btn-primary {
-    background: #1e5bb8;
+    background: #b70619;
     color: #ffffff;
 }
 
 .btn-primary:hover {
-    background: #00163b;
+    background: #000000;
 }
 
 .btn-primary:disabled {
-    background: #aec6ff;
+    background: #b9bec1;
     cursor: not-allowed;
 }
 
@@ -191,7 +191,7 @@
 .list-header button {
     background: none;
     border: none;
-    color: #1e5bb8;
+    color: #b70619;
     font-weight: 600;
     cursor: pointer;
 }
@@ -226,8 +226,8 @@
 }
 
 .search-input:focus {
-    border-color: #1e5bb8;
-    box-shadow: 0 0 0 3px rgba(30, 91, 184, 0.12);
+    border-color: #b70619;
+    box-shadow: 0 0 0 3px rgba(183, 6, 25, 0.12);
     background: #ffffff;
 }
 
@@ -262,13 +262,13 @@
 }
 
 .avatar.primary {
-    background: #d8e2ff;
-    color: #00163b;
+    background: #f3f4f6;
+    color: #000000;
 }
 
 .avatar.secondary {
-    background: #aec6ff;
-    color: #00163b;
+    background: #b9bec1;
+    color: #000000;
 }
 
 /* USER INFO */
@@ -309,8 +309,8 @@
 }
 
 .role-badge.admin {
-    background: #d8e2ff;
-    color: #1e5bb8;
+    background: #f3f4f6;
+    color: #b70619;
 }
 
 .role-badge.mantenimiento {
@@ -344,11 +344,11 @@
 }
 
 .edit-btn {
-    color: #1e5bb8;
+    color: #b70619;
 }
 
 .edit-btn:hover {
-    background: rgba(30, 91, 184, 0.1);
+    background: rgba(183, 6, 25, 0.1);
 }
 
 .delete-btn {

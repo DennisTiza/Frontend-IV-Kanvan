@@ -97,7 +97,7 @@
 
     padding-left: 12px;
 
-    border-left: 4px solid #1e5bb8;
+    border-left: 4px solid #b70619;
 
     color: #44474f;
 
@@ -114,7 +114,7 @@
 .form-group label {
     font-size: 14px;
     font-weight: 600;
-    color: #00163b;
+    color: #000000;
 }
 
 .optional {
@@ -142,8 +142,8 @@
 
 .form-group input:focus,
 .form-group select:focus {
-    border-color: #1e5bb8;
-    box-shadow: 0 0 0 3px rgba(30, 91, 184, 0.12);
+    border-color: #b70619;
+    box-shadow: 0 0 0 3px rgba(183, 6, 25, 0.12);
     background: #ffffff;
 }
 
@@ -204,7 +204,7 @@
 .cancel-btn {
     background: white;
     border: 1px solid #747780;
-    color: #00163b;
+    color: #000000;
 }
 
 .cancel-btn:hover {
@@ -212,16 +212,16 @@
 }
 
 .save-btn {
-    background: #1e5bb8;
+    background: #b70619;
     color: white;
 }
 
 .save-btn:hover {
-    background: #00163b;
+    background: #000000;
 }
 
 .save-btn:disabled {
-    background: #aec6ff;
+    background: #b9bec1;
     cursor: not-allowed;
 }
 

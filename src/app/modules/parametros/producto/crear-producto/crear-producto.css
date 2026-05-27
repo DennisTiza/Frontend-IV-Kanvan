@@ -26,7 +26,7 @@
   font-size: 32px;
   font-weight: 700;
   margin: 0 0 8px 0;
-  color: #00163b;
+  color: #000000;
 }
 
 .page-header p {
@@ -131,8 +131,8 @@
 }
 
 .search-input:focus {
-  border-color: #1e5bb8;
-  box-shadow: 0 0 0 3px rgba(30, 91, 184, 0.12);
+  border-color: #b70619;
+  box-shadow: 0 0 0 3px rgba(183, 6, 25, 0.12);
   background: #fff;
 }
 
@@ -176,7 +176,7 @@
 .product-code {
   font-size: 14px;
   font-weight: 600;
-  color: #1e5bb8;
+  color: #b70619;
 }
 
 .product-name {
@@ -216,7 +216,7 @@
 }
 
 .edit-btn {
-  color: #1e5bb8;
+  color: #b70619;
 }
 
 .delete-btn {
@@ -224,8 +224,8 @@
 }
 
 .edit-btn:hover {
-  background: rgba(30, 91, 184, 0.1);
-  color: #1e5bb8;
+  background: rgba(183, 6, 25, 0.1);
+  color: #b70619;
 }
 
 .delete-btn:hover {
@@ -268,8 +268,8 @@
 }
 
 .input:focus {
-  border-color: #1e5bb8;
-  box-shadow: 0 0 0 3px rgba(30, 91, 184, 0.12);
+  border-color: #b70619;
+  box-shadow: 0 0 0 3px rgba(183, 6, 25, 0.12);
   background: #fff;
 }
 
@@ -286,8 +286,8 @@
 
 /* ALERTA */
 .alert-box {
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
+  background: #fff5f5;
+  border: 1px solid #ffccd0;
   border-radius: 12px;
   padding: 14px 16px;
 }
@@ -296,7 +296,7 @@
   display: flex;
   gap: 12px;
   align-items: flex-start;
-  color: #1e5bb8;
+  color: #b70619;
 }
 
 .alert-content .material-symbols-outlined {
@@ -343,16 +343,16 @@
 }
 
 .btn-primary {
-  background: #1e5bb8;
+  background: #b70619;
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #00163b;
+  background: #000000;
 }
 
 .btn-primary:disabled {
-  background: #aec6ff;
+  background: #b9bec1;
   cursor: not-allowed;
 }
 

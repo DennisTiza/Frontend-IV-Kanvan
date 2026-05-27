@@ -58,9 +58,9 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid #1e5bb8;
+  border: 1px solid #b70619;
   background: white;
-  color: #1e5bb8;
+  color: #b70619;
   padding: 10px 16px;
   border-radius: 12px;
   cursor: pointer;
@@ -73,7 +73,7 @@
 }
 
 .add-btn:hover:not(:disabled) {
-  background: #eff6ff;
+  background: #fff5f5;
 }
 
 .add-btn-disabled {
@@ -160,8 +160,8 @@
 .order-badge {
   width: 34px;
   height: 34px;
-  background: #eff6ff;
-  color: #1e5bb8;
+  background: #fff5f5;
+  color: #b70619;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
@@ -188,7 +188,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #1e5bb8;
+  color: #b70619;
   font-weight: 500;
 }
 

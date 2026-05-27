@@ -10,9 +10,9 @@
     align-items: center;
     justify-content: center;
     background:
-        radial-gradient(circle at top left, rgba(255, 255, 255, 0.12), transparent 28%),
-        radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.08), transparent 32%),
-        linear-gradient(135deg, #061224 0%, #0c2d63 48%, #dfe7f5 100%);
+        radial-gradient(circle at top left, rgba(183, 6, 25, 0.16), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(185, 190, 193, 0.12), transparent 35%),
+        linear-gradient(135deg, #000000 0%, #151515 50%, #2b2b2b 100%);
 }
 
 .login-card {
@@ -28,7 +28,7 @@
 
 .left-panel {
     width: 42%;
-    background: #0c2d63;
+    background: #111111;
     position: relative;
     padding: 42px;
     display: flex;
@@ -42,7 +42,7 @@
     position: absolute;
     width: 300px;
     height: 300px;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(183, 6, 25, 0.12);
     border-radius: 50%;
     top: -120px;
     left: -120px;
@@ -88,7 +88,7 @@
 }
 
 .left-panel p {
-    color: #9db4d8;
+    color: #b9bec1;
     line-height: 1.65;
     font-size: 15px;
     max-width: 320px;
@@ -113,7 +113,7 @@
 }
 
 .bottom-info span {
-    color: #d5dff0;
+    color: #b9bec1;
     font-size: 14px;
 }
 
@@ -133,7 +133,7 @@
 
 .form-box h2 {
     font-size: 36px;
-    color: #08224c;
+    color: #000000;
     margin-bottom: 8px;
     font-weight: 700;
 }
@@ -169,9 +169,9 @@
 }
 
 .field input:focus {
-    border-color: #0c2d63;
+    border-color: #b70619;
     background: #fff;
-    box-shadow: 0 0 0 4px rgba(12, 45, 99, 0.08);
+    box-shadow: 0 0 0 4px rgba(183, 6, 25, 0.08);
 }
 
 .password-box {
@@ -199,8 +199,8 @@
 
 .password-toggle:hover,
 .password-toggle:focus-visible {
-    background: rgba(12, 45, 99, 0.08);
-    color: #0c2d63;
+    background: rgba(183, 6, 25, 0.08);
+    color: #b70619;
 }
 
 .submit-button {
@@ -208,20 +208,20 @@
     height: 54px;
     border: none;
     border-radius: 12px;
-    background: #001b4d;
+    background: #b70619;
     color: #fff;
     font-size: 18px;
     font-weight: 600;
     cursor: pointer;
     margin-top: 10px;
     transition: 0.3s;
-    box-shadow: 0 10px 20px rgba(0, 27, 77, 0.18);
+    box-shadow: 0 10px 20px rgba(183, 6, 25, 0.18);
 }
 
 .submit-button:hover:not(:disabled),
 .submit-button:focus-visible:not(:disabled) {
     transform: translateY(-2px);
-    background: #002868;
+    background: #920514;
 }
 
 .submit-button:disabled {
@@ -239,7 +239,7 @@
 }
 
 .show-errors {
-    color: #b42318;
+    color: #b70619;
     margin-top: 8px;
     font-size: 13px;
     line-height: 1.4;

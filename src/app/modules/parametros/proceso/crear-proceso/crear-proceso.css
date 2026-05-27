@@ -25,7 +25,7 @@
   font-size: 32px;
   font-weight: 700;
   margin: 0 0 8px 0;
-  color: #00163b;
+  color: #000000;
 }
 
 .page-header p {
@@ -39,7 +39,7 @@
 	font-size: clamp(30px, 4vw, 42px);
 	line-height: 1.05;
 	font-weight: 800;
-	color: #00163b;
+	color: #000000;
 }
 
 .page-description {
@@ -131,9 +131,9 @@
 }
 
 .input:focus {
-	border-color: #1e5bb8;
+	border-color: #b70619;
 	background: #ffffff;
-	box-shadow: 0 0 0 4px rgba(30, 91, 184, 0.12);
+	box-shadow: 0 0 0 4px rgba(183, 6, 25, 0.12);
 }
 
 .input-error {
@@ -179,12 +179,12 @@
 }
 
 .btn-primary {
-	background: #1e5bb8;
+	background: #b70619;
 	color: #ffffff;
 }
 
 .btn-primary:hover {
-	background: #184a98;
+	background: #920514;
 }
 
 .table-card {
@@ -236,9 +236,9 @@
 }
 
 .search-input:focus {
-	border-color: #1e5bb8;
+	border-color: #b70619;
 	background: #ffffff;
-	box-shadow: 0 0 0 4px rgba(30, 91, 184, 0.12);
+	box-shadow: 0 0 0 4px rgba(183, 6, 25, 0.12);
 }
 
 .action-btn {
@@ -318,7 +318,7 @@
 .code {
 	font-size: 14px;
 	font-weight: 700;
-	color: #1e5bb8;
+	color: #b70619;
 }
 
 .name {
@@ -346,7 +346,7 @@
 }
 
 .edit-btn {
-	color: #1e5bb8;
+	color: #b70619;
 }
 
 .delete-btn {
@@ -354,8 +354,8 @@
 }
 
 .edit-btn:hover {
-	background: rgba(30, 91, 184, 0.1);
-	color: #1e5bb8;
+	background: rgba(183, 6, 25, 0.1);
+	color: #b70619;
 }
 
 .delete-btn:hover {
