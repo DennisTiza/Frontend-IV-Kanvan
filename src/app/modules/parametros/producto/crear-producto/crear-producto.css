@@ -81,6 +81,11 @@
 .products-header {
   padding: 20px 24px;
   border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .products-section {
@@ -94,6 +99,41 @@
   text-transform: uppercase;
   letter-spacing: 1px;
   color: #6b7280;
+}
+
+.search-box {
+  position: relative;
+  min-width: 240px;
+  max-width: 320px;
+  width: 100%;
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  pointer-events: none;
+  display: inline-flex;
+}
+
+.search-input {
+  width: 100%;
+  border: 1px solid #c4c6d0;
+  border-radius: 12px;
+  background: #f1f4f6;
+  padding: 10px 14px 10px 42px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  font-family: inherit;
+}
+
+.search-input:focus {
+  border-color: #1e5bb8;
+  box-shadow: 0 0 0 3px rgba(30, 91, 184, 0.12);
+  background: #fff;
 }
 
 .table-container {
@@ -164,17 +204,23 @@
 }
 
 .action-btn {
-  width: 36px;
-  height: 36px;
   border: none;
   background: transparent;
-  border-radius: 10px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: 0.2s;
-  color: #6b7280;
+  padding: 6px;
+  transition: background 0.2s ease, color 0.2s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+.edit-btn {
+  color: #1e5bb8;
+}
+
+.delete-btn {
+  color: #ba1a1a;
 }
 
 .edit-btn:hover {
@@ -314,5 +360,13 @@
 @media (max-width: 992px) {
   .content-grid {
     grid-template-columns: 1fr;
+  }
+
+  .products-header {
+    align-items: stretch;
+  }
+
+  .search-box {
+    max-width: none;
   }
 }

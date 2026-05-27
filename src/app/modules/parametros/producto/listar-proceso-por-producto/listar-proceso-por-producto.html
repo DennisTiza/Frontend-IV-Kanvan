@@ -13,16 +13,37 @@
       </p>
     </div>
 
-    <button class="add-btn" [disabled]="!productoId" [class.add-btn-disabled]="!productoId"
-      (click)="abrirModalAgregar()">
-      <!-- Icono add (SVG inline) -->
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="12" y1="5" x2="12" y2="19" />
-        <line x1="5" y1="12" x2="19" y2="12" />
-      </svg>
-      Agregar Proceso
-    </button>
+    <div class="table-tools">
+      <label class="search-box" for="buscar-procesos-producto">
+        <span class="search-icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+        </span>
+        <input
+          id="buscar-procesos-producto"
+          type="search"
+          class="search-input"
+          placeholder="Buscar proceso..."
+          [value]="filtroBusqueda"
+          (input)="actualizarFiltroBusqueda($event)"
+          aria-label="Buscar procesos del producto"
+        />
+      </label>
+
+      <button class="add-btn" [disabled]="!productoId" [class.add-btn-disabled]="!productoId"
+        (click)="abrirModalAgregar()">
+        <!-- Icono add (SVG inline) -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        Agregar Proceso
+      </button>
+    </div>
   </div>
 
   <!-- TABLA -->
@@ -39,7 +60,7 @@
       </thead>
 
       <tbody>
-        @if (procesos.length === 0) {
+        @if (procesosFiltrados.length === 0) {
         <tr>
           <td colspan="5" class="empty-state">
             <!-- Icono inbox (SVG inline) -->
@@ -49,26 +70,24 @@
               <path
                 d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
             </svg>
-            <p>{{ productoId ? 'No hay procesos registrados para este producto.' : 'Guarde el producto para agregar
-              procesos.' }}
-            </p>
+            <p>{{ mensajeEstadoVacio }}</p>
           </td>
         </tr>
         }
 
-        @for (item of procesos; track item.id; let i = $index) {
+        @for (item of procesosFiltrados; track item.id; let i = $index) {
         <tr>
           <!-- Orden -->
           <td>
             <span class="order-badge">
-              {{ (i + 1).toString().padStart(2, '0') }}
+              {{ (item.orden ?? (i + 1)).toString().padStart(2, '0') }}
             </span>
           </td>
 
           <!-- Proceso -->
           <td>
-            <p class="process-title">{{ obtenerNombreProceso(item.idProceso) }}</p>
-            <p class="process-subtitle">{{ obtenerCodigoProceso(item.idProceso) }}</p>
+            <p class="process-title">{{ obtenerNombreProceso(item.procesoId) }}</p>
+            <p class="process-subtitle">{{ obtenerCodigoProceso(item.procesoId) }}</p>
           </td>
 
           <!-- Lote -->

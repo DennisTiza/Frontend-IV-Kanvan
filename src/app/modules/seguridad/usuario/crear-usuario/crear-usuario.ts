@@ -20,6 +20,7 @@ export class CrearUsuario implements OnInit {
   usuarios: UsuarioModel[] = [];
   roles: RolModel[] = [];
   mostrarClave: boolean = false;
+  filtroBusqueda: string = '';
 
   /** Usuario que se pasa al modal de edición (null = modal cerrado) */
   usuarioSeleccionado: UsuarioModel | null = null;
@@ -30,11 +31,32 @@ export class CrearUsuario implements OnInit {
   get usuariosPaginados(): UsuarioModel[] {
     const inicio = (this.paginaActual - 1) * this.registrosPorPagina;
     const fin = inicio + this.registrosPorPagina;
-    return this.usuarios.slice(inicio, fin);
+    return this.usuariosFiltrados.slice(inicio, fin);
+  }
+
+  get usuariosFiltrados(): UsuarioModel[] {
+    const termino = this.filtroBusqueda.trim().toLowerCase();
+
+    if (!termino) {
+      return this.usuarios;
+    }
+
+    return this.usuarios.filter((usuario) => {
+      const nombre = `${usuario.nombre ?? ''} ${usuario.apellido ?? ''}`.toLowerCase();
+      const correo = (usuario.correo ?? '').toLowerCase();
+      const rol = this.obtenerNombreRol(usuario.rolId).toLowerCase();
+
+      return nombre.includes(termino) || correo.includes(termino) || rol.includes(termino);
+    });
   }
 
   cambiarPagina(pagina: number): void {
     this.paginaActual = pagina;
+  }
+
+  actualizarFiltroBusqueda(event: Event): void {
+    this.filtroBusqueda = (event.target as HTMLInputElement).value;
+    this.paginaActual = 1;
   }
 
   constructor(
@@ -60,6 +82,7 @@ export class CrearUsuario implements OnInit {
     this.seguridadService.obtenerUsuarios().subscribe({
       next: (data) => {
         this.usuarios = data;
+        this.paginaActual = 1;
         this.cdr.detectChanges();
       },
       error: (err) => console.error('Error al cargar usuarios:', err)

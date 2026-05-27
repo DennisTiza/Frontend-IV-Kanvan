@@ -2,7 +2,7 @@ export class ProductoXProcesoModel {
     id?: number;
     cantidad?: number;
     tiempo?: number;
-    idProducto?: number;
-    idProceso?: number;
+    productoId?: number;
+    procesoId?: number;
     orden?: number;
 }

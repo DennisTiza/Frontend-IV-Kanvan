@@ -20,6 +20,7 @@ export class ListarProcesoPorProducto implements OnChanges {
   procesos: ProductoXProcesoModel[] = [];
   listaProcesos: ProcesoModel[] = [];
   mostrarModalAgregar: boolean = false;
+  filtroBusqueda: string = '';
 
   constructor(
     private productoXProcesoService: ProductoXProcesoService,
@@ -29,11 +30,53 @@ export class ListarProcesoPorProducto implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['productoId'] && this.productoId) {
+      this.filtroBusqueda = '';
       this.cargarProcesos();
       this.cargarListaProcesos();
     } else if (changes['productoId'] && !this.productoId) {
       this.procesos = [];
+      this.filtroBusqueda = '';
     }
+  }
+
+  get procesosFiltrados(): ProductoXProcesoModel[] {
+    const termino = this.filtroBusqueda.trim().toLowerCase();
+
+    if (!termino) {
+      return this.procesos;
+    }
+
+    return this.procesos.filter((item) => {
+      const nombreProceso = this.obtenerNombreProceso(item.procesoId).toLowerCase();
+      const codigoProceso = this.obtenerCodigoProceso(item.procesoId).toLowerCase();
+      const orden = String(item.orden ?? '').toLowerCase();
+      const cantidad = String(item.cantidad ?? '').toLowerCase();
+      const tiempo = String(item.tiempo ?? '').toLowerCase();
+
+      return (
+        nombreProceso.includes(termino) ||
+        codigoProceso.includes(termino) ||
+        orden.includes(termino) ||
+        cantidad.includes(termino) ||
+        tiempo.includes(termino)
+      );
+    });
+  }
+
+  get mensajeEstadoVacio(): string {
+    if (!this.productoId) {
+      return 'Guarde el producto primero para gestionar sus procesos.';
+    }
+
+    if (this.filtroBusqueda.trim()) {
+      return 'No se encontraron procesos que coincidan con la búsqueda.';
+    }
+
+    return 'No hay procesos registrados para este producto.';
+  }
+
+  actualizarFiltroBusqueda(event: Event): void {
+    this.filtroBusqueda = (event.target as HTMLInputElement).value;
   }
 
   cargarProcesos(): void {
@@ -42,7 +85,7 @@ export class ListarProcesoPorProducto implements OnChanges {
       .ListarProductosXProcesoPorProducto(String(this.productoId))
       .subscribe({
         next: (data) => {
-          this.procesos = data;
+          this.procesos = [...data].sort((a, b) => (a.orden ?? Number.MAX_SAFE_INTEGER) - (b.orden ?? Number.MAX_SAFE_INTEGER));
           this.cdr.detectChanges();
         },
         error: (err) => console.error('Error al cargar procesos del producto:', err),

@@ -22,6 +22,7 @@ export class CrearProducto implements OnInit {
   relacionesProductoProceso: ProductoXProcesoModel[] = [];
   paginaActual: number = 1;
   registrosPorPagina: number = ConfiguracionPaginacion.registrosPorPagina;
+  filtroBusqueda: string = '';
 
   /** Producto recién creado / seleccionado para listar sus procesos */
   productoActual: ProductoModel | null = null;
@@ -29,11 +30,26 @@ export class CrearProducto implements OnInit {
   get productosPaginados(): ProductoModel[] {
     const inicio = (this.paginaActual - 1) * this.registrosPorPagina;
     const fin = inicio + this.registrosPorPagina;
-    return this.productos.slice(inicio, fin);
+    return this.productosFiltrados.slice(inicio, fin);
   }
 
   get totalRegistrosMostrados(): number {
-    return this.productos.length;
+    return this.productosFiltrados.length;
+  }
+
+  get productosFiltrados(): ProductoModel[] {
+    const termino = this.filtroBusqueda.trim().toLowerCase();
+
+    if (!termino) {
+      return this.productos;
+    }
+
+    return this.productos.filter((producto) => {
+      const codigo = (producto.codigo ?? '').toLowerCase();
+      const nombre = (producto.nombre ?? '').toLowerCase();
+
+      return codigo.includes(termino) || nombre.includes(termino);
+    });
   }
 
 
@@ -80,6 +96,11 @@ export class CrearProducto implements OnInit {
     this.paginaActual = pagina;
   }
 
+  actualizarFiltroBusqueda(event: Event): void {
+    this.filtroBusqueda = (event.target as HTMLInputElement).value;
+    this.paginaActual = 1;
+  }
+
   seleccionarProducto(producto: ProductoModel): void {
     this.productoActual = producto;
     this.productoForm.patchValue({
@@ -90,7 +111,7 @@ export class CrearProducto implements OnInit {
 
   obtenerCantidadProcesos(productoId?: number): number {
     if (!productoId) return 0;
-    return this.relacionesProductoProceso.filter((relacion) => relacion.idProducto === productoId).length;
+    return this.relacionesProductoProceso.filter((relacion) => relacion.productoId === productoId).length;
   }
 
   textoProcesos(productoId?: number): string {
