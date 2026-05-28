@@ -14,6 +14,10 @@ import { UsuarioValidadoModel } from '../../models/usuario.validado.model';
 export class Inicio {
   fGroup: FormGroup = new FormGroup({});
   mostrarClave = signal(false);
+  
+  // Estados para el modal de error elegante
+  mostrarModalError = signal(false);
+  mensajeError = signal('');
 
   constructor(
     private fb: FormBuilder,
@@ -37,7 +41,7 @@ export class Inicio {
   IdentificarUsuario() {
     if (this.fGroup.invalid) {
       this.fGroup.markAllAsTouched();
-      alert('Datos incompletos');
+      this.mostrarErrorModal('Por favor, complete todos los campos requeridos correctamente.');
       return;
     }
 
@@ -51,14 +55,29 @@ export class Inicio {
           this.servicioSeguridad.AlmacenarDatosUsuarioValidado(resp);
           this.router.navigate([this.servicioSeguridad.ObtenerPrimerMenu()]);
         } else {
-          alert('Usuario o clave incorrectos');
+          this.mostrarErrorModal('El correo electrónico o la contraseña ingresados son incorrectos. Por favor, verifíquelos e intente nuevamente.');
         }
       },
       error: (err) => {
         console.log(err);
-        alert('Usuario o clave incorrectos');
+        // Si el estado es 0, suele indicar que el servidor está caído o hay un fallo de red
+        if (err.status === 0) {
+          this.mostrarErrorModal('No se pudo establecer conexión con el servidor. Por favor, verifique su conexión a internet y asegúrese de que el backend esté activo.');
+        } else {
+          // Para otros códigos de estado (400, 401, etc.), asumimos credenciales incorrectas como hacía el alert original
+          this.mostrarErrorModal('El correo electrónico o la contraseña ingresados son incorrectos. Por favor, verifíquelos e intente nuevamente.');
+        }
       }
     });
+  }
+
+  mostrarErrorModal(mensaje: string) {
+    this.mensajeError.set(mensaje);
+    this.mostrarModalError.set(true);
+  }
+
+  cerrarModalError() {
+    this.mostrarModalError.set(false);
   }
 
   alternarClave() {

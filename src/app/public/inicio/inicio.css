@@ -302,3 +302,157 @@
         margin-top: 28px;
     }
 }
+
+/* ==========================================================================
+   ESTILOS PREMIUM PARA EL MODAL DE ERROR (ACCESO DENEGADO)
+   ========================================================================== */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(15, 15, 15, 0.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.modal-card {
+    background: #ffffff;
+    border-radius: 24px;
+    width: min(440px, 90vw);
+    padding: 36px 32px 32px;
+    position: relative;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.2), 
+        0 0 0 1px rgba(183, 6, 25, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transform: scale(0.92);
+    opacity: 0;
+    animation: modalScaleIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    padding: 6px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    transform: rotate(90deg);
+}
+
+.modal-icon-container {
+    margin-bottom: 24px;
+}
+
+.modal-icon-bg {
+    width: 80px;
+    height: 80px;
+    background: rgba(183, 6, 25, 0.08);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #b70619;
+    box-shadow: 0 0 0 8px rgba(183, 6, 25, 0.03);
+    animation: modalPulseGlow 2.5s infinite ease-in-out;
+}
+
+.error-svg {
+    filter: drop-shadow(0 2px 4px rgba(183, 6, 25, 0.2));
+}
+
+.modal-content h3 {
+    font-size: 24px;
+    color: #0f172a;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+    letter-spacing: -0.5px;
+}
+
+.modal-content p {
+    font-size: 15px;
+    color: #64748b;
+    line-height: 1.6;
+    margin: 0 0 28px 0;
+    font-weight: 450;
+}
+
+.modal-actions {
+    width: 100%;
+}
+
+.modal-btn-confirm {
+    width: 100%;
+    height: 52px;
+    border: none;
+    border-radius: 14px;
+    background: #b70619;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 16px rgba(183, 6, 25, 0.15);
+}
+
+.modal-btn-confirm:hover {
+    background: #920514;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px rgba(183, 6, 25, 0.25);
+}
+
+.modal-btn-confirm:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 8px rgba(183, 6, 25, 0.15);
+}
+
+/* Animations Keyframes */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes modalScaleIn {
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes modalPulseGlow {
+    0%, 100% {
+        box-shadow: 0 0 0 8px rgba(183, 6, 25, 0.03);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 0 16px rgba(183, 6, 25, 0.08);
+        transform: scale(1.03);
+    }
+}
