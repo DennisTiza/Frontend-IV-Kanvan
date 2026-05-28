@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { SeguridadService } from '../../../services/seguridad.service';
 import { ItemMenuModel } from '../../../models/itemMenu.model';
@@ -10,7 +10,7 @@ import { ItemMenuModel } from '../../../models/itemMenu.model';
   styleUrl: './menu-lateral.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MenuLateral {
+export class MenuLateral implements OnInit {
   private readonly servicioSeguridad = inject(SeguridadService);
   private readonly router = inject(Router);
   readonly abierto = input(false);
@@ -28,7 +28,18 @@ export class MenuLateral {
   });
 
   ngOnInit() {
-    this.menuDinamico.set(this.servicioSeguridad.ObtenerItemsMenu());
+    const items = this.servicioSeguridad.ObtenerItemsMenu();
+    const sesion = this.servicioSeguridad.ObtenerDatosUsuarioIdentificado();
+    const esOperario = sesion?.rolId === 2;
+
+    if (esOperario) {
+      this.menuDinamico.set(items.filter(item =>
+        item.ruta !== '/parametros/tarjeta-produccion/tablero-operario' &&
+        item.ruta !== '/parametros/tarjeta-produccion/kanban'
+      ));
+    } else {
+      this.menuDinamico.set(items);
+    }
   }
 
   protected obtenerIcono(texto?: string): string {

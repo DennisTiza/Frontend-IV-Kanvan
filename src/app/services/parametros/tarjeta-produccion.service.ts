@@ -12,7 +12,45 @@ export class TarjetaProduccionService {
 
   constructor(private http: HttpClient) { }
 
+  private baseUrl = `${this.urlBase}tarjeta-de-produccion`;
+
   ListarTarjetas(): Observable<TarjetaProduccionModel[]> {
-    return this.http.get<TarjetaProduccionModel[]>(`${this.urlBase}tarjeta-produccion`);
+    return this.http.get<TarjetaProduccionModel[]>(this.baseUrl);
+  }
+
+  ListarTarjetasKanban(): Observable<TarjetaProduccionModel[]> {
+    return this.http.get<TarjetaProduccionModel[]>(this.baseUrl);
+  }
+
+  CrearTarjeta(datos: Partial<TarjetaProduccionModel>): Observable<TarjetaProduccionModel> {
+    return this.http.post<TarjetaProduccionModel>(this.baseUrl, datos);
+  }
+
+  BuscarTarjeta(id: number): Observable<TarjetaProduccionModel> {
+    return this.http.get<TarjetaProduccionModel>(`${this.baseUrl}/${id}`);
+  }
+
+  EliminarTarjeta(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/${id}`);
+  }
+
+  ListarTarjetasActivasConProcesos(): Observable<TarjetaProduccionModel[]> {
+    const filter = {
+      where: { estado: 'activa' },
+      include: [
+        {
+          relation: 'procesoXTarjetas',
+          scope: {
+            include: [
+              { relation: 'proceso' },
+              { relation: 'usuario' },
+            ],
+          },
+        },
+      ],
+    };
+    return this.http.get<TarjetaProduccionModel[]>(
+      `${this.baseUrl}?filter=${encodeURIComponent(JSON.stringify(filter))}`
+    );
   }
 }

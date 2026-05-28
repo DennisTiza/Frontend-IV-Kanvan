@@ -1,0 +1,77 @@
+<div class="page-shell">
+  <section class="page-header">
+    <h1 class="page-title">Tarjeta de Producción</h1>
+    <p class="page-description">Visualiza y gestiona las tarjetas de producción.</p>
+  </section>
+
+  <div class="kanban-grid">
+    <!-- Columna: Por hacer -->
+    <div class="kanban-column">
+      <div class="column-header column-header-pendiente">
+        <div class="column-title">
+          <svg class="column-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <span>Por hacer</span>
+        </div>
+        <span class="column-badge badge-pendiente">{{ porHacer().length }}</span>
+      </div>
+
+      <div class="column-cards">
+        @for (tarjeta of porHacer(); track tarjeta.id) {
+          <app-kanban-card [tarjeta]="tarjeta" />
+        } @empty {
+          <div class="column-empty">No hay tarjetas pendientes</div>
+        }
+      </div>
+
+      <button class="column-footer-btn">
+        Ver todas ({{ porHacer().length }})
+      </button>
+    </div>
+
+    <!-- Columna: En ejecución -->
+    <div class="kanban-column">
+      <div class="column-header column-header-ejecucion">
+        <div class="column-title">
+          <svg class="column-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span>En ejecución</span>
+        </div>
+        <span class="column-badge badge-ejecucion">{{ enEjecucion().length }}</span>
+      </div>
+
+      <div class="column-cards">
+        @for (tarjeta of enEjecucion(); track tarjeta.id) {
+          <app-kanban-card [tarjeta]="tarjeta" />
+        } @empty {
+          <div class="column-empty">No hay tarjetas en ejecución</div>
+        }
+      </div>
+
+      <button class="column-footer-btn">
+        Ver todas ({{ enEjecucion().length }})
+      </button>
+    </div>
+
+    <!-- Columna: Finalizadas -->
+    <div class="kanban-column">
+      <div class="column-header column-header-finalizadas">
+        <div class="column-title">
+          <svg class="column-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Finalizadas</span>
+        </div>
+        <span class="column-badge badge-finalizadas">{{ finalizadas().length }}</span>
+      </div>
+
+      <div class="column-cards">
+        @for (tarjeta of finalizadas(); track tarjeta.id) {
+          <app-kanban-card [tarjeta]="tarjeta" />
+        } @empty {
+          <div class="column-empty">No hay tarjetas finalizadas</div>
+        }
+      </div>
+
+      <button class="column-footer-btn">
+        Ver todas ({{ finalizadas().length }})
+      </button>
+    </div>
+  </div>
+</div>

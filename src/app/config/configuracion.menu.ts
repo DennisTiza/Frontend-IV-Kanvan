@@ -9,7 +9,7 @@ export namespace ConfiguracionMenu {
         {
             id: "2",
             titulo: "Tarjeta De Producción",
-            ruta: "/parametros/tarjeta-produccion/listar-tarjeta-produccion",
+            ruta: "/parametros/tarjeta-produccion/kanban",
             accion: "Listar"
         },
         {
@@ -23,6 +23,6 @@ export namespace ConfiguracionMenu {
             titulo: "Procesos",
             ruta: "/parametros/proceso/crear-proceso",
             accion: "Guardar"
-        }
+        },
     ];
 }

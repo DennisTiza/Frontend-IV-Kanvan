@@ -108,10 +108,10 @@ export class CrearUsuario implements OnInit {
   obtenerClaseRol(rolId?: number): string {
     const nombre = this.obtenerNombreRol(rolId).toLowerCase();
     if (nombre.includes('supervisor')) return 'supervisor';
-    if (nombre.includes('operario')) return 'operario';
+    if (nombre.includes('usuario')) return 'usuario';
     if (nombre.includes('admin')) return 'admin';
     if (nombre.includes('mantenimiento')) return 'mantenimiento';
-    return 'operario'; // Default
+    return 'usuario';
   }
 
   obtenerIniciales(nombre?: string, apellido?: string): string {

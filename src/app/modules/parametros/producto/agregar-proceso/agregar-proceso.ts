@@ -32,8 +32,6 @@ export class AgregarProceso implements OnInit {
     this.procesoForm = this.fb.group({
       idProceso: ['', Validators.required],
       orden: ['', [Validators.required, Validators.min(1)]],
-      cantidad: ['', [Validators.required, Validators.min(1)]],
-      tiempo: ['', [Validators.required, Validators.min(1)]],
     });
   }
 
@@ -62,8 +60,6 @@ export class AgregarProceso implements OnInit {
       productoId: this.productoId,
       procesoId: Number(this.procesoForm.get('idProceso')?.value),
       orden: Number(this.procesoForm.get('orden')?.value),
-      cantidad: Number(this.procesoForm.get('cantidad')?.value),
-      tiempo: Number(this.procesoForm.get('tiempo')?.value),
     };
 
     this.productoXProcesoService.RegistrarProductoXProceso(datos).subscribe({

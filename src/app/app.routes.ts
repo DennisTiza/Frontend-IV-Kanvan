@@ -5,7 +5,9 @@ import { ValidarSesionActivaGuard } from './guard/validar-sesion-activa.guard';
 import { CrearUsuario } from './modules/seguridad/usuario/crear-usuario/crear-usuario';
 import { CrearProducto } from './modules/parametros/producto/crear-producto/crear-producto';
 import { CrearProceso } from './modules/parametros/proceso/crear-proceso/crear-proceso';
-import { ListarTarjetaProduccion } from './modules/parametros/tarjeta-produccion/listar-tarjeta-produccion/listar-tarjeta-produccion';
+import { CrearTarjetaProduccion } from './modules/parametros/tarjeta-produccion/crear-tarjeta/crear-tarjeta';
+import { EditarProcesosTarjeta } from './modules/parametros/tarjeta-produccion/editar-procesos/editar-procesos';
+import { KanbanBoardComponent } from './modules/parametros/tarjeta-produccion/kanban-board/kanban-board';
 
 export const routes: Routes = [
     {
@@ -35,7 +37,22 @@ export const routes: Routes = [
     },
     {
         path: 'parametros/tarjeta-produccion/listar-tarjeta-produccion',
-        component: ListarTarjetaProduccion,
+        component: KanbanBoardComponent,
+        canActivate: [ValidarSesionActivaGuard]
+    },
+    {
+        path: 'parametros/tarjeta-produccion/crear-tarjeta',
+        component: CrearTarjetaProduccion,
+        canActivate: [ValidarSesionActivaGuard]
+    },
+    {
+        path: 'parametros/tarjeta-produccion/editar-procesos/:id',
+        component: EditarProcesosTarjeta,
+        canActivate: [ValidarSesionActivaGuard]
+    },
+    {
+        path: 'parametros/tarjeta-produccion/kanban',
+        component: KanbanBoardComponent,
         canActivate: [ValidarSesionActivaGuard]
     },
     {

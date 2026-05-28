@@ -1,0 +1,108 @@
+<div class="page-shell">
+  <section class="page-header">
+    <h1 class="page-title">Crear Tarjeta de Producción</h1>
+    <p class="page-description">Complete el formulario para registrar una nueva tarjeta de producción.</p>
+  </section>
+
+  <section class="card form-card">
+    <div class="card-header">
+      <h2 class="card-title">Nueva Tarjeta</h2>
+    </div>
+
+    <form [formGroup]="tarjetaForm" (ngSubmit)="guardarTarjeta()" class="tarjeta-form">
+      <div class="form-grid">
+        <div>
+          <label class="label" for="codigo">Código</label>
+          <input
+            id="codigo"
+            type="text"
+            formControlName="codigo"
+            class="input"
+            placeholder="Ej: TAR-001"
+            [class.input-error]="tarjetaForm.get('codigo')?.invalid && tarjetaForm.get('codigo')?.touched"
+          />
+          @if (tarjetaForm.get('codigo')?.invalid && tarjetaForm.get('codigo')?.touched) {
+            <span class="error-msg">El código es obligatorio.</span>
+          }
+        </div>
+
+        <div>
+          <label class="label" for="productoId">Producto</label>
+          <select
+            id="productoId"
+            formControlName="productoId"
+            class="input"
+            [class.input-error]="tarjetaForm.get('productoId')?.invalid && tarjetaForm.get('productoId')?.touched"
+          >
+            <option value="0" disabled>Seleccione un producto</option>
+            @for (producto of productos(); track producto.id) {
+              <option [value]="producto.id">{{ producto.nombre }} ({{ producto.codigo }})</option>
+            }
+          </select>
+          @if (tarjetaForm.get('productoId')?.invalid && tarjetaForm.get('productoId')?.touched) {
+            <span class="error-msg">Debe seleccionar un producto.</span>
+          }
+        </div>
+
+        <div>
+          <label class="label" for="cantidad">Cantidad</label>
+          <input
+            id="cantidad"
+            type="number"
+            formControlName="cantidad"
+            class="input"
+            placeholder="Ej: 100"
+            [class.input-error]="tarjetaForm.get('cantidad')?.invalid && tarjetaForm.get('cantidad')?.touched"
+          />
+          @if (tarjetaForm.get('cantidad')?.invalid && tarjetaForm.get('cantidad')?.touched) {
+            <span class="error-msg">La cantidad es obligatoria y debe ser mayor a 0.</span>
+          }
+        </div>
+
+        <div>
+          <label class="label" for="estado">Estado</label>
+          <select id="estado" formControlName="estado" class="input">
+            <option value="activa">Activa</option>
+            <option value="completada">Completada</option>
+            <option value="cancelada">Cancelada</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="label" for="fechaInicio">Fecha de Inicio</label>
+          <input
+            id="fechaInicio"
+            type="date"
+            formControlName="fechaInicio"
+            class="input"
+            [class.input-error]="tarjetaForm.get('fechaInicio')?.invalid && tarjetaForm.get('fechaInicio')?.touched"
+          />
+          @if (tarjetaForm.get('fechaInicio')?.invalid && tarjetaForm.get('fechaInicio')?.touched) {
+            <span class="error-msg">La fecha de inicio es obligatoria.</span>
+          }
+        </div>
+
+        <div>
+          <label class="label" for="fechaFinal">Fecha Final</label>
+          <input
+            id="fechaFinal"
+            type="date"
+            formControlName="fechaFinal"
+            class="input"
+            [class.input-error]="tarjetaForm.get('fechaFinal')?.invalid && tarjetaForm.get('fechaFinal')?.touched"
+          />
+          @if (tarjetaForm.get('fechaFinal')?.invalid && tarjetaForm.get('fechaFinal')?.touched) {
+            <span class="error-msg">La fecha final es obligatoria.</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline" (click)="cancelar()">Cancelar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando...' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </section>
+</div>
