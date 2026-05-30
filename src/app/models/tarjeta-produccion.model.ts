@@ -3,6 +3,7 @@ import { ProcesosXTarjetaModel } from './procesos-x-tarjeta.model';
 export class TarjetaProduccionModel {
     id?: number;
     codigo?: string;
+    fechaPlaneacion?: string;
     fechaInicio?: string;
     fechaFinal?: string;
     productoId?: number;

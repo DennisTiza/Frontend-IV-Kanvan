@@ -17,11 +17,6 @@ export class TarjetaProduccionService {
   ListarTarjetas(): Observable<TarjetaProduccionModel[]> {
     return this.http.get<TarjetaProduccionModel[]>(this.baseUrl);
   }
-
-  ListarTarjetasKanban(): Observable<TarjetaProduccionModel[]> {
-    return this.http.get<TarjetaProduccionModel[]>(this.baseUrl);
-  }
-
   CrearTarjeta(datos: Partial<TarjetaProduccionModel>): Observable<TarjetaProduccionModel> {
     return this.http.post<TarjetaProduccionModel>(this.baseUrl, datos);
   }

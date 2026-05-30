@@ -5,7 +5,7 @@ export class ProcesosXTarjetaModel {
     id?: number;
     procesoId?: number;
     tarjetaDeProduccionId?: number;
-    usuarioId?: number;
+    operarioId?: number;
     cantidad?: number;
     tiempo?: number;
     proceso?: ProcesoModel;
