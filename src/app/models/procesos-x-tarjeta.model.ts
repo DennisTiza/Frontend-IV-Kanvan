@@ -1,5 +1,5 @@
+import { OperarioModel } from './operario.model';
 import { ProcesoModel } from './proceso.model';
-import { UsuarioModel } from './usuario.model';
 
 export class ProcesosXTarjetaModel {
     id?: number;
@@ -9,5 +9,5 @@ export class ProcesosXTarjetaModel {
     cantidad?: number;
     tiempo?: number;
     proceso?: ProcesoModel;
-    usuario?: UsuarioModel;
+    operario?: OperarioModel;
 }
