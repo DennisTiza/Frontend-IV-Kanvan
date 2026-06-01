@@ -1,0 +1,95 @@
+@if (abierto()) {
+<div class="modal-overlay" id="modal-overlay" role="presentation" (click)="cerrarModal()">
+	<div class="modal-container" role="dialog" aria-modal="true" aria-labelledby="modal-titulo" aria-describedby="modal-descripcion" (click)="$event.stopPropagation()">
+
+		<div class="modal-header">
+			<div>
+				<h2 class="modal-title" id="modal-titulo">{{ titulo() }}</h2>
+
+				<div class="modal-badge-container">
+					<span class="badge">TARJETA</span>
+					<span class="tarjeta-codigo">{{ tarjetaCodigo() || 'TP-2024-001' }}</span>
+				</div>
+			</div>
+
+			<button class="close-btn" type="button" aria-label="Cerrar modal" (click)="cerrarModal()">
+				✕
+			</button>
+		</div>
+
+		<form class="modal-form" [formGroup]="modalForm" (ngSubmit)="guardarAsignacion()">
+			<div class="modal-body">
+
+				<div class="info-box" id="modal-descripcion">
+					<span aria-hidden="true">ℹ️</span>
+					<p>
+						Define los tiempos estimados y asigna el personal responsable
+						para cada fase de la producción.
+					</p>
+				</div>
+
+				@if (tieneProcesos) {
+					<div class="procesos-container" formArrayName="procesos">
+						@for (procesoControl of controlesProcesos; track trackPorProceso($index); let i = $index) {
+							<div class="proceso-block">
+								<div class="proceso-row" [formGroupName]="i">
+
+									<div class="proceso-info">
+										<label>Proceso</label>
+										<span>{{ obtenerNombreProceso(procesos()[i]) }}</span>
+									</div>
+
+									<div>
+										<label [for]="'tiempo-' + i">Tiempo (Min)</label>
+										<input
+											[id]="'tiempo-' + i"
+											type="number"
+											min="1"
+											placeholder="45"
+											formControlName="tiempo"
+										/>
+									</div>
+
+									<div>
+										<label [for]="'operario-' + i">Responsable</label>
+										<select [id]="'operario-' + i" formControlName="operarioId">
+											<option [ngValue]="null" disabled>Seleccionar operario</option>
+											@for (operario of operarios(); track operario.id) {
+												<option [ngValue]="operario.id">{{ obtenerNombreOperario(operario) }}</option>
+											}
+										</select>
+									</div>
+
+								</div>
+
+								@if (i < controlesProcesos.length - 1) {
+									<hr>
+								}
+							</div>
+						}
+					</div>
+				} @else {
+					<div class="empty-state">
+						<h3>No hay procesos disponibles</h3>
+						<p>Cuando la tarjeta tenga procesos configurados, aparecerán aquí para asignar tiempo y responsable.</p>
+					</div>
+				}
+
+			</div>
+
+			<div class="modal-footer">
+
+				<button class="btn-cancelar" type="button" (click)="cerrarModal()">
+					Cancelar
+				</button>
+
+				<button class="btn-guardar" type="submit" [disabled]="modalForm.invalid || cargando() || !tieneProcesos">
+					{{ cargando() ? 'Guardando...' : 'Finalizar Asignación' }}
+				</button>
+
+			</div>
+		</form>
+
+	</div>
+</div>
+}

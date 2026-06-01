@@ -87,8 +87,8 @@ export class KanbanCardComponent implements OnInit, OnDestroy {
 
   obtenerNombreOperario(): string {
     if (this.tarjeta.procesoXTarjetas && this.tarjeta.procesoXTarjetas.length > 0) {
-      const usuario = this.tarjeta.procesoXTarjetas[0].usuario;
-      if (usuario) return `${usuario.nombre ?? ''} ${usuario.apellido ?? ''}`.trim();
+      const operario = this.tarjeta.procesoXTarjetas[0].operario;
+      if (operario) return `${operario.nombre ?? ''} ${operario.apellido ?? ''}`.trim();
     }
     return 'Sin asignar';
   }

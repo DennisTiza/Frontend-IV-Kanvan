@@ -23,7 +23,7 @@ export class KanbanBoardComponent implements OnInit {
   }
 
   cargarTarjetas(): void {
-    this.tarjetaService.ListarTarjetasKanban().subscribe({
+    this.tarjetaService.ListarTarjetas().subscribe({
       next: (data) => {
         this.porHacer.set(data.filter((t) => t.estado === 'por_hacer'));
         this.enEjecucion.set(data.filter((t) => t.estado === 'en ejecución'));

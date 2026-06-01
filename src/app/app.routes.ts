@@ -5,8 +5,7 @@ import { ValidarSesionActivaGuard } from './guard/validar-sesion-activa.guard';
 import { CrearUsuario } from './modules/seguridad/usuario/crear-usuario/crear-usuario';
 import { CrearProducto } from './modules/parametros/producto/crear-producto/crear-producto';
 import { CrearProceso } from './modules/parametros/proceso/crear-proceso/crear-proceso';
-import { CrearTarjetaProduccion } from './modules/parametros/tarjeta-produccion/crear-tarjeta/crear-tarjeta';
-import { EditarProcesosTarjeta } from './modules/parametros/tarjeta-produccion/editar-procesos/editar-procesos';
+import { CrearTarjetaProduccion } from './modules/parametros/tarjeta-produccion/crear-tarjeta-produccion/crear-tarjeta-produccion';
 import { KanbanBoardComponent } from './modules/parametros/tarjeta-produccion/kanban-board/kanban-board';
 
 export const routes: Routes = [
@@ -41,13 +40,8 @@ export const routes: Routes = [
         canActivate: [ValidarSesionActivaGuard]
     },
     {
-        path: 'parametros/tarjeta-produccion/crear-tarjeta',
+        path: 'parametros/tarjeta-produccion/crear-tarjeta-produccion',
         component: CrearTarjetaProduccion,
-        canActivate: [ValidarSesionActivaGuard]
-    },
-    {
-        path: 'parametros/tarjeta-produccion/editar-procesos/:id',
-        component: EditarProcesosTarjeta,
         canActivate: [ValidarSesionActivaGuard]
     },
     {

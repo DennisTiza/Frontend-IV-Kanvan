@@ -1,0 +1,242 @@
+<div class="page-shell">
+	<section class="page-header">
+		<div>
+			<h1>Gestión de Tarjetas de Producción</h1>
+			<p>Crea y administra las tarjetas de producción.</p>
+		</div>
+	</section>
+
+	<div class="content-grid">
+		<section class="card form-card">
+			<div class="section-heading">
+				<h2>{{ tarjetaSeleccionada() ? 'Editar Tarjeta de Producción' : 'Nueva Tarjeta de Producción' }}</h2>
+			</div>
+
+			<form [formGroup]="tarjetaForm" (ngSubmit)="guardarTarjeta()" class="form-grid">
+				<div class="form-group">
+					<label for="codigo">Código de Tarjeta</label>
+					<input
+						id="codigo"
+						type="text"
+						formControlName="codigo"
+						placeholder="TP-2026-001"
+						[class.input-error]="tarjetaForm.get('codigo')?.invalid && tarjetaForm.get('codigo')?.touched"
+					/>
+					@if (tarjetaForm.get('codigo')?.invalid && tarjetaForm.get('codigo')?.touched) {
+						<span class="error-msg">El código es obligatorio.</span>
+					}
+				</div>
+
+				<div class="form-group">
+					<label for="productoId">Producto / Referencia</label>
+					<select
+						id="productoId"
+						formControlName="productoId"
+						[class.input-error]="tarjetaForm.get('productoId')?.invalid && tarjetaForm.get('productoId')?.touched"
+					>
+						<option [ngValue]="null">Seleccione un producto...</option>
+						@for (producto of productos(); track producto.id) {
+							<option [ngValue]="producto.id">
+								{{ producto.codigo }} - {{ producto.nombre }}
+							</option>
+						}
+					</select>
+					@if (tarjetaForm.get('productoId')?.invalid && tarjetaForm.get('productoId')?.touched) {
+						<span class="error-msg">Seleccione un producto.</span>
+					}
+				</div>
+
+				<div class="form-group">
+					<label for="cantidad">Cantidad a Producir</label>
+					<input
+						id="cantidad"
+						type="number"
+						min="1"
+						formControlName="cantidad"
+						[class.input-error]="tarjetaForm.get('cantidad')?.invalid && tarjetaForm.get('cantidad')?.touched"
+					/>
+					@if (tarjetaForm.get('cantidad')?.invalid && tarjetaForm.get('cantidad')?.touched) {
+						<span class="error-msg">La cantidad debe ser mayor a cero.</span>
+					}
+				</div>
+
+				<div class="form-group">
+					<label for="fechaPlaneada">Fecha Inicio Estimada</label>
+					<input
+						id="fechaPlaneada"
+						type="date"
+						formControlName="fechaPlaneada"
+						[class.input-error]="tarjetaForm.get('fechaPlaneada')?.invalid && tarjetaForm.get('fechaPlaneada')?.touched"
+					/>
+					@if (tarjetaForm.get('fechaPlaneada')?.invalid && tarjetaForm.get('fechaPlaneada')?.touched) {
+						<span class="error-msg">La fecha estimada es obligatoria.</span>
+					}
+				</div>
+
+
+
+				<div class="actions full-width">
+					<button type="button" class="btn-secondary" (click)="cancelarEdicion()">Cancelar</button>
+					<button type="submit" class="btn-primary" [disabled]="tarjetaForm.invalid || guardando()">
+						{{ guardando() ? 'Guardando...' : (tarjetaSeleccionada() ? 'Actualizar' : 'Guardar') }}
+					</button>
+				</div>
+			</form>
+		</section>
+
+		<aside class="summary">
+			<h2>Resumen de Asignaciones</h2>
+
+			<div class="stat-card">
+				<span class="stat-icon stat-icon-today" aria-hidden="true">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+						<line x1="16" y1="2" x2="16" y2="6"></line>
+						<line x1="8" y1="2" x2="8" y2="6"></line>
+						<line x1="3" y1="10" x2="21" y2="10"></line>
+					</svg>
+				</span>
+				<div>
+					<p>Asignadas para Hoy</p>
+					<h3>{{ tarjetasHoy() }}</h3>
+				</div>
+			</div>
+
+			<div class="stat-card">
+				<span class="stat-icon stat-icon-week" aria-hidden="true">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M3 4h18v16H3z"></path>
+						<path d="M8 2v4"></path>
+						<path d="M16 2v4"></path>
+						<path d="M3 10h18"></path>
+					</svg>
+				</span>
+				<div>
+					<p>Asignadas esta Semana</p>
+					<h3>{{ tarjetasSemana() }}</h3>
+				</div>
+			</div>
+
+			<div class="stat-card">
+				<span class="stat-icon stat-icon-month" aria-hidden="true">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<circle cx="12" cy="12" r="9"></circle>
+						<path d="M12 7v5l3 3"></path>
+					</svg>
+				</span>
+				<div>
+					<p>Asignadas este Mes</p>
+					<h3>{{ tarjetasMes() }}</h3>
+				</div>
+			</div>
+		</aside>
+	</div>
+
+	<section class="table-section">
+		<div class="table-header">
+			<div>
+				<h2 class="table-title">Tarjetas de Producción Registradas</h2>
+			</div>
+
+			<label class="search-box" for="buscar-tarjetas">
+				<span class="search-icon" aria-hidden="true">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<circle cx="11" cy="11" r="8"></circle>
+						<path d="m21 21-4.3-4.3"></path>
+					</svg>
+				</span>
+				<input
+					id="buscar-tarjetas"
+					type="search"
+					placeholder="Buscar tarjeta, producto o estado..."
+					[value]="filtroBusqueda()"
+					(input)="actualizarFiltro($event)"
+				/>
+			</label>
+		</div>
+
+		<div class="table-container">
+			<table>
+				<thead>
+					<tr>
+						<th>Código</th>
+						<th>Producto</th>
+						<th>Cantidad</th>
+						<th>Fecha Inicio</th>
+						<th>Estado</th>
+						<th>Acciones</th>
+					</tr>
+				</thead>
+
+				<tbody>
+					@if (tarjetasFiltradas().length === 0) {
+						<tr>
+							<td colspan="6" class="empty-row">
+								No hay tarjetas registradas para mostrar.
+							</td>
+						</tr>
+					}
+
+					@for (tarjeta of tarjetasPaginadas(); track trackPorId($index, tarjeta)) {
+						<tr>
+							<td>
+								<span class="card-code">{{ tarjeta.codigo }}</span>
+							</td>
+							<td>{{ obtenerNombreProducto(tarjeta) }}</td>
+							<td>{{ tarjeta.cantidad ?? '-' }}</td>
+							<td>{{ tarjeta.fechaPlaneada || tarjeta.fechaInicio || '-' }}</td>
+							<td>
+								<span
+									class="badge"
+									[class.badge-pendiente]="esEstadoPorHacer(tarjeta.estado)"
+									[class.badge-proceso]="esEstadoEnEjecucion(tarjeta.estado)"
+									[class.badge-completado]="esEstadoFinalizada(tarjeta.estado)"
+								>
+									{{ obtenerEstadoEtiqueta(tarjeta.estado) }}
+								</span>
+							</td>
+							<td>
+								<div class="row-actions">
+									<button class="icon-btn" type="button" (click)="seleccionarTarjeta(tarjeta)" title="Editar tarjeta">
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+											<path d="M12 20h9"></path>
+											<path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+										</svg>
+									</button>
+
+									<button class="icon-btn delete" type="button" (click)="eliminarTarjeta(tarjeta)" title="Eliminar tarjeta">
+										<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+											<polyline points="3 6 5 6 21 6"></polyline>
+											<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+											<path d="M10 11v6"></path>
+											<path d="M14 11v6"></path>
+											<path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+										</svg>
+									</button>
+								</div>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+
+		@if (tarjetasFiltradas().length > 0) {
+			<app-paginador [paginaActual]="paginaActual" [totalRegistros]="totalRegistrosMostrados"
+				[registrosPorPagina]="registrosPorPagina" nombreEntidad="tarjetas" (cambioPagina)="cambiarPagina($event)">
+			</app-paginador>
+		}
+	</section>
+
+	<app-editar-proceso-produccion
+		[abierto]="modalProcesoAbierto()"
+		[tarjetaCodigo]="tarjetaModal()?.codigo ?? ''"
+		[tarjetaId]="tarjetaModal()?.id ?? null"
+		[procesos]="procesosModal()"
+		[asignaciones]="asignacionesModal()"
+		[operarios]="operariosModal()"
+		[cargando]="guardandoProcesos()"
+		(cerrar)="cerrarModalProcesos()"
+		(guardar)="guardarProcesosTarjeta($event)"
+	></app-editar-proceso-produccion>
+</div>
