@@ -141,7 +141,7 @@ export class SeguridadService {
     if (menu.length > 0 && menu[0].ruta) {
       return menu[0].ruta;
     }
-    return '/inicio';
+    return "";
   }
 
   RemoverDatosUsuarioValidado() {

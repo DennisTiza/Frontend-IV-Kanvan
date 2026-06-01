@@ -1,0 +1,37 @@
+<div class="resumen-card">
+
+  <h3 class="resumen-titulo">Resumen de Asignaciones</h3>
+
+  <!-- Calendario semanal -->
+  <div class="semana-grid">
+    @for (dia of semana(); track dia.numero) {
+    <div class="dia-card" [class.hoy]="dia.esHoy">
+      @if (dia.esHoy) {
+      <span class="dia-hoy">Hoy</span>
+      <div class="dia-circulo"><span>{{ dia.numero }}</span></div>
+      <span class="dia-badge badge-hoy">{{ dia.cantidad }}</span>
+      } @else {
+      <span class="dia-nombre">{{ dia.nombre }}</span>
+      <span class="dia-numero">{{ dia.numero }}</span>
+      <span class="dia-badge">{{ dia.cantidad }}</span>
+      }
+    </div>
+    }
+  </div>
+
+  <!-- Estadísticas -->
+  <div class="estadisticas">
+    <div class="estadisticas-header">{{ mesAnio() }}</div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <p class="stat-label">Total Tarjetas</p>
+        <p class="stat-valor">{{ totalTarjetas() }}</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-label">Completadas</p>
+        <p class="stat-valor completadas">{{ tarjetasCompletadas() }}</p>
+      </div>
+    </div>
+  </div>
+
+</div>

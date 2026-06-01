@@ -29,17 +29,7 @@ export class MenuLateral implements OnInit {
 
   ngOnInit() {
     const items = this.servicioSeguridad.ObtenerItemsMenu();
-    const sesion = this.servicioSeguridad.ObtenerDatosUsuarioIdentificado();
-    const esOperario = sesion?.rolId === 2;
-
-    if (esOperario) {
-      this.menuDinamico.set(items.filter(item =>
-        item.ruta !== '/parametros/tarjeta-produccion/tablero-operario' &&
-        item.ruta !== '/parametros/tarjeta-produccion/kanban'
-      ));
-    } else {
-      this.menuDinamico.set(items);
-    }
+    this.menuDinamico.set(items);
   }
 
   protected obtenerIcono(texto?: string): string {

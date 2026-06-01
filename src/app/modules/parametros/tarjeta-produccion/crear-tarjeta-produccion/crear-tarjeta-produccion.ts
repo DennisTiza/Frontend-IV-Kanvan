@@ -8,6 +8,7 @@ import { ProcesoModel } from '../../../../models/proceso.model';
 import { ProcesoXTarjetaModel } from '../../../../models/procesoXTarjeta.model';
 import { TarjetaProduccionModel } from '../../../../models/tarjeta-produccion.model';
 import { EditarProcesoProduccion } from '../editar-proceso-produccion/editar-proceso-produccion';
+import { ResumenAsignaciones } from '../resumen-asignaciones/resumen-asignaciones';
 import { ProductoService } from '../../../../services/parametros/producto.service';
 import { ProductoXProcesoService } from '../../../../services/parametros/producto-xproceso.service';
 import { ProcesoService } from '../../../../services/parametros/proceso.service';
@@ -20,7 +21,7 @@ import { Paginador } from '../../../../public/componentes/paginador/paginador';
 @Component({
   selector: 'app-crear-tarjeta-produccion',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Paginador, EditarProcesoProduccion],
+  imports: [CommonModule, ReactiveFormsModule, Paginador, EditarProcesoProduccion, ResumenAsignaciones],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './crear-tarjeta-produccion.html',
   styleUrl: './crear-tarjeta-produccion.css',
@@ -46,6 +47,7 @@ export class CrearTarjetaProduccion implements OnInit {
   readonly cargando = signal(false);
   readonly guardando = signal(false);
   readonly filtroBusqueda = signal('');
+  readonly esNuevaTarjeta = signal(false);
 
   paginaActual: number = 1;
   registrosPorPagina: number = ConfiguracionPaginacion.registrosPorPagina;
@@ -84,9 +86,7 @@ export class CrearTarjetaProduccion implements OnInit {
     return this.tarjetasFiltradas().length;
   }
 
-  readonly tarjetasHoy = computed(() => this.contarPorFecha(this.tarjetas(), 'hoy'));
-  readonly tarjetasSemana = computed(() => this.contarPorFecha(this.tarjetas(), 'semana'));
-  readonly tarjetasMes = computed(() => this.contarPorFecha(this.tarjetas(), 'mes'));
+
 
   ngOnInit(): void {
     this.cargarProductos();
@@ -151,6 +151,7 @@ export class CrearTarjetaProduccion implements OnInit {
     }
 
     const tarjetaActual = this.tarjetaSeleccionada();
+    const esCreacion = !tarjetaActual?.id;
     const formValue = this.tarjetaForm.getRawValue();
     const datos: Partial<TarjetaProduccionModel> = {
       codigo: formValue.codigo?.trim(),
@@ -176,6 +177,7 @@ export class CrearTarjetaProduccion implements OnInit {
           ...(tarjetaGuardada ?? {}),
         };
 
+        this.esNuevaTarjeta.set(esCreacion);
         this.guardando.set(false);
         this.cancelarEdicion();
         this.cargarTarjetas();
@@ -242,6 +244,16 @@ export class CrearTarjetaProduccion implements OnInit {
   }
 
   cerrarModalProcesos(): void {
+    const tarjeta = this.tarjetaModal();
+
+    if (this.esNuevaTarjeta() && tarjeta?.id) {
+      this.tarjetaService.EliminarTarjeta(tarjeta.id).subscribe({
+        next: () => this.cargarTarjetas(),
+        error: (error: unknown) => console.error('Error al revertir la tarjeta de producción:', error),
+      });
+    }
+
+    this.esNuevaTarjeta.set(false);
     this.modalProcesoAbierto.set(false);
     this.tarjetaModal.set(null);
     this.procesosModal.set([]);
@@ -266,6 +278,7 @@ export class CrearTarjetaProduccion implements OnInit {
       return this.procesoXTarjetaService.RegistrarProcesoTarjeta(asignacion);
     })).subscribe({
       next: () => {
+        this.esNuevaTarjeta.set(false);
         this.guardandoProcesos.set(false);
         this.cerrarModalProcesos();
         this.cargarTarjetas();
@@ -275,43 +288,6 @@ export class CrearTarjetaProduccion implements OnInit {
         this.guardandoProcesos.set(false);
       },
     });
-  }
-
-  private contarPorFecha(tarjetas: TarjetaProduccionModel[], rango: 'hoy' | 'semana' | 'mes'): number {
-    const hoy = new Date();
-
-    return tarjetas.filter((tarjeta) => {
-      const fechaBase = this.obtenerFechaBase(tarjeta);
-      if (!fechaBase) {
-        return false;
-      }
-
-      const fecha = new Date(fechaBase);
-      if (Number.isNaN(fecha.getTime())) {
-        return false;
-      }
-
-      if (rango === 'hoy') {
-        return fecha.toDateString() === hoy.toDateString();
-      }
-
-      if (rango === 'semana') {
-        const diferenciaDias = Math.floor((hoy.getTime() - fecha.getTime()) / 86400000);
-        return diferenciaDias >= 0 && diferenciaDias < 7;
-      }
-
-      return fecha.getMonth() === hoy.getMonth() && fecha.getFullYear() === hoy.getFullYear();
-    }).length;
-  }
-
-  private obtenerFechaBase(tarjeta: TarjetaProduccionModel): string {
-    if (tarjeta.fechaPlaneada instanceof Date) {
-      return tarjeta.fechaPlaneada.toISOString();
-    }
-    if (typeof tarjeta.fechaPlaneada === 'string') {
-      return tarjeta.fechaPlaneada;
-    }
-    return tarjeta.fechaInicio ?? '';
   }
 
   private normalizarFechaInput(fecha: string | Date | undefined): string {
@@ -335,6 +311,28 @@ export class CrearTarjetaProduccion implements OnInit {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  formatearFecha(fecha: string | Date | undefined | null): string {
+    if (!fecha) return '—';
+
+    const raw = typeof fecha === 'string'
+      ? fecha.split('T')[0].split(' ')[0]
+      : null;
+
+    if (raw) {
+      const [year, month, day] = raw.split('-').map(Number);
+      const d = new Date(year, month - 1, day);
+      if (!isNaN(d.getTime())) {
+        return d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      }
+    }
+
+    if (fecha instanceof Date && !isNaN(fecha.getTime())) {
+      return fecha.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    return '—';
   }
 
   private abrirModalProcesos(tarjeta: TarjetaProduccionModel): void {
@@ -362,7 +360,6 @@ export class CrearTarjetaProduccion implements OnInit {
           .map((relacion) => procesos.find((proceso) => proceso.id === relacion.procesoId))
           .filter((proceso): proceso is ProcesoModel => Boolean(proceso));
 
-        // If product-process relations are missing, use existing assignments as source for the edit modal.
         if (!procesosOrdenados.length && asignaciones.length) {
           procesosOrdenados = asignaciones
             .map((asignacion) => procesos.find((proceso) => proceso.id === asignacion.procesoId))
