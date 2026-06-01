@@ -8,14 +8,13 @@
         @if (productoNombre) {
         Ruta de manufactura para <strong>{{ productoNombre }}</strong>.
         } @else {
-        Guarde el producto primero para gestionar sus procesos.
+        Agregue los procesos que componen este producto.
         }
       </p>
     </div>
 
     <div class="table-tools">
-      <button class="add-btn" [disabled]="!productoId" [class.add-btn-disabled]="!productoId"
-        (click)="abrirModalAgregar()">
+      <button class="add-btn" [disabled]="deshabilitarAgregar" [class.add-btn-disabled]="deshabilitarAgregar" (click)="abrirModalAgregar()">
         <!-- Icono add (SVG inline) -->
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -55,7 +54,16 @@
         }
 
         @for (item of procesosFiltrados; track item.id; let i = $index) {
-        <tr>
+        <tr
+          draggable="true"
+          (dragstart)="onDragStart($event, i)"
+          (dragover)="onDragOver($event, i)"
+          (dragleave)="onDragLeave($event, i)"
+          (drop)="onDrop($event, i)"
+          (dragend)="onDragEnd($event)"
+          [class.dragging]="dragStartIndex === i"
+          [class.drag-over]="dragOverIndex === i"
+        >
           <!-- Orden -->
           <td>
             <span class="order-badge">
@@ -71,7 +79,7 @@
 
           <!-- Acciones -->
           <td class="right">
-            <button class="delete-btn" (click)="eliminarProcesoXProducto(item.id)" title="Eliminar proceso">
+            <button class="delete-btn" (click)="eliminarProcesoXProducto(i)" title="Eliminar proceso">
               <!-- Icono delete (SVG inline) -->
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -92,6 +100,6 @@
 
 <!-- MODAL: AGREGAR PROCESO -->
 @if (mostrarModalAgregar) {
-<app-agregar-proceso [productoId]="productoId" (cerrado)="onModalCerrado()" (procesoAgregado)="onProcesoAgregado()">
+<app-agregar-proceso [nextOrden]="nextOrden" (cerrado)="onModalCerrado()" (procesoAgregado)="onProcesoAgregado($event)">
 </app-agregar-proceso>
 }

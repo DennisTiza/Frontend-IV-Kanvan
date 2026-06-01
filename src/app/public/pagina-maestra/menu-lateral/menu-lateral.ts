@@ -20,6 +20,7 @@ export class MenuLateral implements OnInit {
 
   protected readonly listaMenus = computed(() => {
     const menus = this.menuDinamico();
+    console.log('Menus cargados:', menus);
 
     if (menus.length > 0) {
       return menus;
