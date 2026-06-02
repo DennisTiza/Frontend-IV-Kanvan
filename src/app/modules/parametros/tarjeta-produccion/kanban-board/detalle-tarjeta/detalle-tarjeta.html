@@ -1,0 +1,61 @@
+<div class="modal-overlay" (click)="cerrarModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <h2 class="modal-titulo">{{ tarjeta().codigo }}</h2>
+        <span class="modal-producto">{{ tarjeta().productoNombre }}</span>
+      </div>
+      <button class="modal-close-btn" (click)="cerrarModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="close-icon"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="procesos-lista">
+        @for (proceso of tarjeta().procesoXTarjetas; track proceso.id) {
+          <div class="proceso-item {{ obtenerEstado(proceso).clase }}">
+            <div class="proceso-item-header">
+              <span class="proceso-nombre">{{ proceso.proceso?.nombre ?? 'Sin nombre' }}</span>
+              <span class="proceso-badge {{ obtenerEstado(proceso).clase }}-badge">{{ obtenerEstado(proceso).texto }}</span>
+            </div>
+
+            <div class="proceso-info">
+              <span class="proceso-info-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="info-icon-sm"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                {{ proceso.tiempo ?? '-' }} min
+              </span>
+              @if (proceso.operario) {
+                <span class="proceso-info-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="info-icon-sm"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  {{ proceso.operario.nombre }} {{ proceso.operario.apellido }}
+                </span>
+              }
+            </div>
+
+            <div class="proceso-accion">
+              @if (puedeIniciar(proceso)) {
+                <button class="btn-accion btn-iniciar" (click)="iniciarProceso(proceso.id)">
+                  Iniciar proceso
+                </button>
+              } @else if (puedeFinalizar(proceso)) {
+                <button class="btn-accion btn-finalizar" (click)="finalizarProceso(proceso.id)">
+                  Finalizar proceso
+                </button>
+              } @else if (proceso.fechaFinal) {
+                <button class="btn-accion btn-completado" disabled>
+                  Completado
+                </button>
+              } @else {
+                <button class="btn-accion btn-bloqueado" disabled>
+                  Bloqueado
+                </button>
+              }
+            </div>
+          </div>
+        } @empty {
+          <div class="sin-procesos">Esta tarjeta no tiene procesos asignados.</div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

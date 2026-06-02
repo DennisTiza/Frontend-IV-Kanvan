@@ -6,6 +6,7 @@ export class ProcesoXTarjetaModel {
     procesoId?: number;
     tarjetaDeProduccionId?: number;
     operarioId?: number;
+    orden?: number;
     tiempo?: number;
     fechaInicio?: string;
     fechaFinal?: string;

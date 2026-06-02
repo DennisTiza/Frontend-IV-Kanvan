@@ -41,4 +41,12 @@ export class ProcesoXtarjetaService {
   EditarProcesoTarjeta(id: string, datos: ProcesoXTarjetaModel): Observable<any> {
     return this.http.patch<any>(`${this.urlBase}proceso-x-tarjeta/${id}`, datos);
   }
+
+  IniciarProceso(id: number): Observable<any> {
+    return this.http.post<any>(`${this.urlBase}proceso-x-tarjeta/${id}/iniciar`, {});
+  }
+
+  FinalizarProceso(id: number): Observable<any> {
+    return this.http.post<any>(`${this.urlBase}proceso-x-tarjeta/${id}/finalizar`, {});
+  }
 }

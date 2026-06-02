@@ -34,10 +34,10 @@ export class TarjetaProduccionService {
     return this.http.delete<any>(`${this.baseUrl}/${id}`);
   }
 
-  ListarTarjetasActivasConProcesos(): Observable<TarjetaProduccionModel[]> {
+  ListarTarjetasConProcesos(): Observable<TarjetaProduccionModel[]> {
     const filter = {
-      where: { estado: 'activa' },
       include: [
+        { relation: 'producto' },
         {
           relation: 'procesoXTarjetas',
           scope: {
@@ -45,6 +45,7 @@ export class TarjetaProduccionService {
               { relation: 'proceso' },
               { relation: 'operario' },
             ],
+            order: ['orden ASC'],
           },
         },
       ],

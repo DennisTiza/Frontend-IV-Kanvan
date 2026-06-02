@@ -17,7 +17,7 @@
 
       <div class="column-cards">
         @for (tarjeta of porHacer(); track tarjeta.id) {
-          <app-kanban-card [tarjeta]="tarjeta" />
+          <app-kanban-card [tarjeta]="tarjeta" (tarjetaClick)="abrirDetalle($event)" />
         } @empty {
           <div class="column-empty">No hay tarjetas pendientes</div>
         }
@@ -40,7 +40,7 @@
 
       <div class="column-cards">
         @for (tarjeta of enEjecucion(); track tarjeta.id) {
-          <app-kanban-card [tarjeta]="tarjeta" />
+          <app-kanban-card [tarjeta]="tarjeta" (tarjetaClick)="abrirDetalle($event)" />
         } @empty {
           <div class="column-empty">No hay tarjetas en ejecución</div>
         }
@@ -75,3 +75,11 @@
     </div>
   </div>
 </div>
+
+@if (tarjetaSeleccionada(); as tarjeta) {
+  <app-detalle-tarjeta
+    [tarjeta]="tarjeta"
+    (cerrar)="cerrarDetalle()"
+    (procesoAccion)="manejarAccionProceso($event)"
+  />
+}
