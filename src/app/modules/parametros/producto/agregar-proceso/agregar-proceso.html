@@ -38,23 +38,6 @@
         }
       </div>
 
-      <!-- Orden -->
-      <div class="form-group">
-        <label class="label" for="orden">Orden en la Secuencia</label>
-        <input
-          id="orden"
-          type="number"
-          formControlName="orden"
-          placeholder="Ej: 1"
-          min="1"
-          class="input"
-          [class.input-error]="procesoForm.get('orden')?.invalid && procesoForm.get('orden')?.touched"
-        />
-        @if (procesoForm.get('orden')?.invalid && procesoForm.get('orden')?.touched) {
-          <span class="error-msg">Ingrese un orden válido (mínimo 1).</span>
-        }
-      </div>
-
 
 
     </form>

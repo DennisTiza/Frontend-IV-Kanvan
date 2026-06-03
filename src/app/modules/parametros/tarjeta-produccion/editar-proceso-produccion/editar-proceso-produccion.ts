@@ -1,0 +1,126 @@
+import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { OperarioModel } from '../../../../models/operario.model';
+import { ProcesoModel } from '../../../../models/proceso.model';
+import { ProcesoXTarjetaModel } from '../../../../models/procesoXTarjeta.model';
+
+type ProcesoFormularioGroup = FormGroup<{
+  procesoId: FormControl<number | null>;
+  tiempo: FormControl<number | null>;
+  operarioId: FormControl<number | null>;
+}>;
+
+@Component({
+  selector: 'app-editar-proceso-produccion',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: './editar-proceso-produccion.html',
+  styleUrl: './editar-proceso-produccion.css',
+})
+export class EditarProcesoProduccion {
+  private readonly fb = inject(FormBuilder);
+
+  readonly abierto = input(true);
+  readonly tarjetaCodigo = input('');
+  readonly tarjetaId = input<number | null>(null);
+  readonly procesos = input<ProcesoModel[]>([]);
+  readonly asignaciones = input<ProcesoXTarjetaModel[]>([]);
+  readonly operarios = input<OperarioModel[]>([]);
+  readonly cargando = input(false);
+
+  readonly cerrar = output<void>();
+  readonly guardar = output<ProcesoXTarjetaModel[]>();
+
+  readonly titulo = computed(() => 'Asignar Tiempos de Procesos');
+
+  readonly modalForm = this.fb.group({
+    procesos: this.fb.array<ProcesoFormularioGroup>([]),
+  });
+
+  constructor() {
+    effect(() => {
+      this.reconstruirFormulario(this.procesos(), this.asignaciones());
+    });
+  }
+
+  get controlesProcesos(): ProcesoFormularioGroup[] {
+    return this.modalForm.controls.procesos.controls;
+  }
+
+  get tieneProcesos(): boolean {
+    return this.controlesProcesos.length > 0;
+  }
+
+  cerrarModal(): void {
+    this.cerrar.emit();
+  }
+
+  guardarAsignacion(): void {
+    if (this.modalForm.invalid) {
+      this.modalForm.markAllAsTouched();
+      return;
+    }
+
+    const asignaciones = this.controlesProcesos.map((control, index) => {
+      const proceso = this.procesos()[index];
+      const valores = control.getRawValue();
+      const asignacionExistente = this.obtenerAsignacionExistente(proceso?.id);
+
+      return {
+        id: asignacionExistente?.id,
+        procesoId: valores.procesoId ?? proceso?.id,
+        operarioId: valores.operarioId ?? undefined,
+        tiempo: valores.tiempo ?? undefined,
+        tarjetaDeProduccionId: this.tarjetaId() ?? undefined,
+      } satisfies ProcesoXTarjetaModel;
+    });
+
+    this.guardar.emit(asignaciones);
+  }
+
+  trackPorProceso(index: number): number {
+    return this.procesos()[index]?.id ?? index;
+  }
+
+  obtenerNombreProceso(proceso: ProcesoModel | undefined): string {
+    if (!proceso) {
+      return 'Proceso no disponible';
+    }
+
+    return [proceso.codigo, proceso.nombre].filter(Boolean).join(' - ') || 'Proceso sin nombre';
+  }
+
+  obtenerNombreOperario(operario: OperarioModel): string {
+    return [operario.nombre, operario.apellido].filter(Boolean).join(' ').trim() || 'Operario sin nombre';
+  }
+
+  private reconstruirFormulario(procesos: ProcesoModel[], asignaciones: ProcesoXTarjetaModel[]): void {
+    const procesosFormArray = this.modalForm.controls.procesos;
+    procesosFormArray.clear();
+
+    procesos.forEach((proceso) => {
+      procesosFormArray.push(this.crearProcesoFormulario(proceso, asignaciones));
+    });
+  }
+
+  private crearProcesoFormulario(proceso: ProcesoModel, asignaciones: ProcesoXTarjetaModel[]): ProcesoFormularioGroup {
+    const asignacion = asignaciones.find((item) => item.procesoId === proceso.id);
+
+    return this.fb.group({
+      procesoId: new FormControl<number | null>(proceso.id ?? null, { validators: [Validators.required] }),
+      tiempo: new FormControl<number | null>(asignacion?.tiempo ?? null, { validators: [Validators.required, Validators.min(1)] }),
+      operarioId: new FormControl<number | null>(asignacion?.operarioId ?? null, { validators: [Validators.required] }),
+    });
+  }
+
+  private obtenerAsignacionExistente(procesoId?: number): ProcesoXTarjetaModel | undefined {
+    if (!procesoId) {
+      return undefined;
+    }
+
+    return this.asignaciones().find((asignacion) => asignacion.procesoId === procesoId);
+  }
+
+}

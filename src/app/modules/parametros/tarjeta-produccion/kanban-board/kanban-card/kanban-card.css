@@ -11,6 +11,10 @@
   box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
 }
 
+.card-clickable {
+  cursor: pointer;
+}
+
 .card-header {
   display: flex;
   justify-content: space-between;
@@ -97,21 +101,55 @@
   border-top: 1px solid #f1f1f1;
 }
 
-.proceso-actual {
+.proceso-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.proceso-info-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.proceso-nombre-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.proceso-numero-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7280;
+  background: #f1f4f6;
+  padding: 2px 8px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.proceso-info-row {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: #374151;
+  color: #4b5563;
 }
 
 .timer-display {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 10px;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 8px;
   background: #f9fafb;
+  flex-shrink: 0;
 }
 
 .timer-icon {
@@ -119,10 +157,10 @@
 }
 
 .timer-value {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 
 .timer-normal {
@@ -163,32 +201,16 @@
   transition: width 1s ease;
 }
 
-.progreso-baja {
-  background: #ef4444;
-}
-
-.progreso-media {
-  background: #f59e0b;
-}
-
-.progreso-alta {
+.progreso-verde {
   background: #10b981;
 }
 
-.progress-metrics {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: #9ca3af;
+.progreso-naranja {
+  background: #f59e0b;
 }
 
-.metric-left {
-  color: #6b7280;
-}
-
-.metric-right {
-  font-weight: 600;
-  color: #374151;
+.progreso-rojo {
+  background: #ef4444;
 }
 
 /* Estado: finalizada */

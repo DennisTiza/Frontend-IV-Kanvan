@@ -140,6 +140,30 @@
   color: #181c1e;
 }
 
+/* DRAG AND DROP STYLES */
+tr[draggable="true"] {
+  cursor: grab;
+}
+
+tr[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+tr.dragging {
+  opacity: 0.5;
+  background-color: #f1f4f6;
+}
+
+tr.drag-over {
+  border-top: 2px solid #1e5bb8; /* Indicador visual de donde se va a soltar */
+}
+
+tr.updating {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+
 .table tbody tr {
   transition: background 0.15s;
 }

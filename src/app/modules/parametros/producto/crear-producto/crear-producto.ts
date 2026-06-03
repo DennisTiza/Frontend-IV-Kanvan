@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfiguracionPaginacion } from '../../../../config/configuracion.paginacion';
 import { Paginador } from '../../../../public/componentes/paginador/paginador';
@@ -8,6 +8,7 @@ import { ProductoXProcesoService } from '../../../../services/parametros/product
 import { ProductoModel } from '../../../../models/producto.model';
 import { ProductoXProcesoModel } from '../../../../models/productoXProceso.model';
 import { ListarProcesoPorProducto } from '../listar-proceso-por-producto/listar-proceso-por-producto';
+import { forkJoin, Observable, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-crear-producto',
@@ -16,7 +17,7 @@ import { ListarProcesoPorProducto } from '../listar-proceso-por-producto/listar-
   templateUrl: './crear-producto.html',
   styleUrl: './crear-producto.css',
 })
-export class CrearProducto implements OnInit {
+export class CrearProducto implements OnInit, OnDestroy {
   productoForm: FormGroup;
   productos: ProductoModel[] = [];
   relacionesProductoProceso: ProductoXProcesoModel[] = [];
@@ -26,6 +27,10 @@ export class CrearProducto implements OnInit {
 
   /** Producto recién creado / seleccionado para listar sus procesos */
   productoActual: ProductoModel | null = null;
+  procesosLocales: ProductoXProcesoModel[] = [];
+  procesosAEliminar: number[] = [];
+  hayCambiosSinGuardar: boolean = false;
+  private formSub?: Subscription;
 
   get productosPaginados(): ProductoModel[] {
     const inicio = (this.paginaActual - 1) * this.registrosPorPagina;
@@ -69,6 +74,16 @@ export class CrearProducto implements OnInit {
   ngOnInit(): void {
     this.cargarProductos();
     this.cargarRelacionesProductoProceso();
+
+    this.formSub = this.productoForm.valueChanges.subscribe(() => {
+      if (this.productoActual) {
+        this.hayCambiosSinGuardar = true;
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.formSub?.unsubscribe();
   }
 
   cargarProductos(): void {
@@ -106,7 +121,24 @@ export class CrearProducto implements OnInit {
     this.productoForm.patchValue({
       codigo: producto.codigo,
       nombre: producto.nombre,
-    });
+    }, { emitEvent: false });
+    this.procesosLocales = this.relacionesProductoProceso
+      .filter(p => p.productoId === producto.id)
+      .sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
+    this.procesosAEliminar = [];
+    this.hayCambiosSinGuardar = false;
+  }
+
+  actualizarProcesos(nuevosProcesos: ProductoXProcesoModel[]): void {
+    this.procesosLocales = nuevosProcesos;
+    this.hayCambiosSinGuardar = true;
+  }
+
+  marcarProcesoEliminar(id: number): void {
+    if (!this.procesosAEliminar.includes(id)) {
+      this.procesosAEliminar.push(id);
+    }
+    this.hayCambiosSinGuardar = true;
   }
 
   obtenerCantidadProcesos(productoId?: number): number {
@@ -135,9 +167,7 @@ export class CrearProducto implements OnInit {
       this.productoService.EditarProducto(String(this.productoActual.id), datos).subscribe({
         next: () => {
           this.productoActual = { ...this.productoActual, ...datos };
-          this.cargarProductos();
-          this.cargarRelacionesProductoProceso();
-          this.cdr.detectChanges();
+          this.guardarProcesos(this.productoActual.id!);
         },
         error: (err) => console.error('Error al editar producto:', err),
       });
@@ -150,11 +180,58 @@ export class CrearProducto implements OnInit {
             codigo: res.codigo,
             nombre: res.nombre,
           });
-          this.cargarProductos();
-          this.cargarRelacionesProductoProceso();
-          this.cdr.detectChanges();
+          this.guardarProcesos(res.id!);
         },
         error: (err: unknown) => console.error('Error al registrar producto:', err),
+      });
+    }
+  }
+
+  guardarProcesos(productoId: number): void {
+    const peticiones: Observable<any>[] = [];
+
+    this.procesosAEliminar.forEach(id => {
+      peticiones.push(this.productoXProcesoService.EliminarProductoXProceso(String(id)));
+    });
+
+    this.procesosLocales.forEach(proceso => {
+      proceso.productoId = productoId;
+      if (proceso.id) {
+        peticiones.push(this.productoXProcesoService.EditarProductoXProceso(String(proceso.id), proceso));
+      } else {
+        peticiones.push(this.productoXProcesoService.RegistrarProductoXProceso(proceso));
+      }
+    });
+
+    if (peticiones.length > 0) {
+      forkJoin(peticiones).subscribe({
+        next: () => {
+          this.finalizarGuardado();
+        },
+        error: (err) => {
+          console.error('Error al sincronizar procesos:', err);
+          alert('El producto se guardó, pero hubo un error al sincronizar los procesos.');
+          this.finalizarGuardado();
+        }
+      });
+    } else {
+      this.finalizarGuardado();
+    }
+  }
+
+  finalizarGuardado(): void {
+    this.hayCambiosSinGuardar = false;
+    this.cargarProductos();
+    this.cargarRelacionesProductoProceso();
+    this.recargarProcesosDelProductoActual();
+  }
+
+  recargarProcesosDelProductoActual(): void {
+    if (this.productoActual?.id) {
+      this.productoXProcesoService.ListarProductosXProcesoPorProducto(String(this.productoActual.id)).subscribe(data => {
+        this.procesosLocales = data.sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
+        this.procesosAEliminar = [];
+        this.cdr.detectChanges();
       });
     }
   }
@@ -162,6 +239,9 @@ export class CrearProducto implements OnInit {
   cancelar(): void {
     this.productoForm.reset();
     this.productoActual = null;
+    this.procesosLocales = [];
+    this.procesosAEliminar = [];
+    this.hayCambiosSinGuardar = false;
   }
 
   eliminarProducto(producto: ProductoModel): void {

@@ -1,0 +1,205 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-container {
+  background: #ffffff;
+  border-radius: 16px;
+  width: 520px;
+  max-width: 90vw;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.modal-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.modal-titulo {
+  font-size: 18px;
+  font-weight: 700;
+  color: #b70619;
+  margin: 0;
+}
+
+.modal-producto {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.modal-close-btn:hover {
+  background: #f3f4f6;
+}
+
+.close-icon {
+  width: 20px;
+  height: 20px;
+  color: #6b7280;
+}
+
+.modal-body {
+  padding: 16px 24px 24px;
+  overflow-y: auto;
+}
+
+.procesos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.proceso-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px 16px;
+  transition: border-color 0.2s;
+}
+
+.proceso-item.estado-en-curso {
+  border-color: #f59e0b;
+  background: #fffbeb;
+}
+
+.proceso-item.estado-completado {
+  border-color: #d1fae5;
+  background: #f0fdf4;
+}
+
+.proceso-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.proceso-nombre {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.proceso-badge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.estado-pendiente-badge {
+  background: #f1f4f6;
+  color: #6b7280;
+}
+
+.estado-en-curso-badge {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.estado-completado-badge {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.proceso-info {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.proceso-info-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.info-icon-sm {
+  width: 14px;
+  height: 14px;
+  color: #9ca3af;
+}
+
+.proceso-accion {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-accion {
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.btn-accion:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-iniciar {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.btn-iniciar:hover {
+  background: #1d4ed8;
+}
+
+.btn-finalizar {
+  background: #059669;
+  color: #ffffff;
+}
+
+.btn-finalizar:hover {
+  background: #047857;
+}
+
+.btn-completado {
+  background: #f1f4f6;
+  color: #6b7280;
+}
+
+.btn-bloqueado {
+  background: #f1f4f6;
+  color: #9ca3af;
+}
+
+.sin-procesos {
+  text-align: center;
+  padding: 32px 16px;
+  color: #9ca3af;
+  font-size: 14px;
+}

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, output, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { ProcesoXTarjetaModel } from '../../../../../models/procesoXTarjeta.model';
 import { TarjetaProduccionModel } from '../../../../../models/tarjeta-produccion.model';
 
 @Component({
@@ -13,6 +14,8 @@ import { TarjetaProduccionModel } from '../../../../../models/tarjeta-produccion
 export class KanbanCardComponent implements OnInit, OnDestroy {
   @Input({ required: true }) tarjeta!: TarjetaProduccionModel;
 
+  readonly tarjetaClick = output<TarjetaProduccionModel>();
+
   private readonly router = inject(Router);
   private timerInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -20,7 +23,9 @@ export class KanbanCardComponent implements OnInit, OnDestroy {
   readonly progreso = signal(0);
 
   ngOnInit(): void {
-    if (this.tarjeta.estado === 'en ejecución') {
+    const proceso = this.obtenerProcesoActivo();
+    if (proceso) {
+      console.log(`[Timer] Iniciado | procesoId: ${proceso.id}, tarjetaId: ${this.tarjeta.id}, codigo: ${this.tarjeta.codigo}`);
       this.iniciarTemporizador();
     }
   }
@@ -42,14 +47,36 @@ export class KanbanCardComponent implements OnInit, OnDestroy {
   }
 
   private actualizarTiempo(): void {
-    if (!this.tarjeta.fechaInicio || !this.tarjeta.cantidad) return;
+    const procesoActivo = this.obtenerProcesoActivo();
+    if (!procesoActivo?.fechaInicio || !procesoActivo?.tiempo) {
+      console.log('[Timer] Retorno temprano', {
+        existeProceso: !!procesoActivo,
+        fechaInicio: procesoActivo?.fechaInicio,
+        tiempo: procesoActivo?.tiempo,
+        tarjetaId: this.tarjeta.id,
+      });
+      return;
+    }
 
-    const inicio = new Date(this.tarjeta.fechaInicio).getTime();
+    const inicio = new Date(procesoActivo.fechaInicio).getTime();
     const ahora = Date.now();
-    const estimadoMs = (this.tarjeta.cantidad || 0) * 60 * 1000;
+    const estimadoMs = procesoActivo.tiempo * 60 * 1000;
     const transcurrido = ahora - inicio;
     const restante = Math.max(0, estimadoMs - transcurrido);
-    const progreso = Math.min(100, Math.round((transcurrido / estimadoMs) * 100));
+    const progreso = Math.min(100, Math.round((restante / estimadoMs) * 100));
+
+    console.log('[Timer] actualizarTiempo', {
+      tarjetaId: this.tarjeta.id,
+      procesoId: procesoActivo.id,
+      tiempo: procesoActivo.tiempo,
+      fechaInicio: procesoActivo.fechaInicio,
+      inicio,
+      ahora,
+      estimadoMs,
+      transcurrido,
+      restante,
+      progreso,
+    });
 
     const horas = Math.floor(restante / 3600000);
     const minutos = Math.floor((restante % 3600000) / 60000);
@@ -62,8 +89,9 @@ export class KanbanCardComponent implements OnInit, OnDestroy {
   }
 
   getTiempoEstimadoLabel(): string {
-    if (!this.tarjeta.cantidad) return '--:--:--';
-    const totalMin = this.tarjeta.cantidad;
+    const procesoActivo = this.obtenerProcesoActivo();
+    if (!procesoActivo?.tiempo) return '--:--:--';
+    const totalMin = procesoActivo.tiempo;
     const h = Math.floor(totalMin / 60);
     const m = totalMin % 60;
     return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`;
@@ -72,7 +100,7 @@ export class KanbanCardComponent implements OnInit, OnDestroy {
   getEstadoBadgeClass(): string {
     const estado = this.tarjeta.estado;
     if (estado === 'por_hacer') return 'badge-pendiente';
-    if (estado === 'en ejecución') return 'badge-en-proceso';
+    if (estado === 'en ejecución' || estado === 'en_proceso') return 'badge-en-proceso';
     if (estado === 'finalizada') return 'badge-finalizada';
     return '';
   }
@@ -80,24 +108,39 @@ export class KanbanCardComponent implements OnInit, OnDestroy {
   getEstadoLabel(): string {
     const estado = this.tarjeta.estado;
     if (estado === 'por_hacer') return 'Por hacer';
-    if (estado === 'en ejecución') return 'En ejecución';
+    if (estado === 'en ejecución' || estado === 'en_proceso') return 'En ejecución';
     if (estado === 'finalizada') return 'Finalizada';
     return estado ?? '';
   }
 
+  obtenerProximoProceso(): ProcesoXTarjetaModel | undefined {
+    if (this.obtenerProcesoActivo()) return undefined;
+    return this.tarjeta.procesoXTarjetas?.find((p) => !p.fechaInicio);
+  }
+
+  obtenerProcesoActivo(): ProcesoXTarjetaModel | undefined {
+    return this.tarjeta.procesoXTarjetas?.find((p) => p.fechaInicio && !p.fechaFinal);
+  }
+
+  obtenerTiempoTotal(): number {
+    return this.tarjeta.procesoXTarjetas?.reduce((sum, p) => sum + (p.tiempo ?? 0), 0) ?? 0;
+  }
+
   obtenerNombreOperario(): string {
-    if (this.tarjeta.procesoXTarjetas && this.tarjeta.procesoXTarjetas.length > 0) {
-      const usuario = this.tarjeta.procesoXTarjetas[0].usuario;
-      if (usuario) return `${usuario.nombre ?? ''} ${usuario.apellido ?? ''}`.trim();
+    const proximo = this.obtenerProximoProceso();
+    const activo = this.obtenerProcesoActivo();
+    const target = proximo ?? activo;
+    if (target?.operario) {
+      return `${target.operario.nombre ?? ''} ${target.operario.apellido ?? ''}`.trim();
     }
     return 'Sin asignar';
   }
 
   obtenerProcesoActual(): string {
-    if (this.tarjeta.procesoXTarjetas && this.tarjeta.procesoXTarjetas.length > 0) {
-      const proceso = this.tarjeta.procesoXTarjetas[0].proceso;
-      return proceso?.nombre ?? 'Sin proceso';
-    }
+    const activo = this.obtenerProcesoActivo();
+    if (activo?.proceso) return activo.proceso.nombre ?? 'Sin proceso';
+    const proximo = this.obtenerProximoProceso();
+    if (proximo?.proceso) return proximo.proceso.nombre ?? 'Sin proceso';
     return 'Sin proceso';
   }
 
@@ -124,16 +167,43 @@ export class KanbanCardComponent implements OnInit, OnDestroy {
 
   getProgresoBarClass(): string {
     const p = this.progreso();
-    if (p < 50) return 'progreso-baja';
-    if (p < 80) return 'progreso-media';
-    return 'progreso-alta';
+    if (p > 80) return 'progreso-verde';
+    if (p > 50) return 'progreso-naranja';
+    return 'progreso-rojo';
+  }
+
+  obtenerProcesoActivoNumero(): number {
+    const activo = this.obtenerProcesoActivo();
+    if (!activo || !this.tarjeta.procesoXTarjetas) return 0;
+    return this.tarjeta.procesoXTarjetas.indexOf(activo) + 1;
+  }
+
+  obtenerFechaCierreUltimoProceso(): string | undefined {
+    const procesos = this.tarjeta.procesoXTarjetas;
+    if (!procesos || procesos.length === 0) return undefined;
+
+    const procesosConFecha = procesos.filter((p) => p.fechaFinal);
+    if (procesosConFecha.length === 0) return undefined;
+
+    // Ordenar por el campo 'orden' ascendente y tomar el último
+    const sorted = [...procesosConFecha].sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
+    return sorted[sorted.length - 1].fechaFinal;
   }
 
   formatCierre(): string {
-    if (this.tarjeta.fechaFinal) {
-      const d = new Date(this.tarjeta.fechaFinal);
+    const fecha = this.obtenerFechaCierreUltimoProceso() ?? this.tarjeta.fechaFinal;
+    if (fecha) {
+      const d = new Date(fecha);
       return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
     }
     return '--/--/---- --:--';
+  }
+
+  onClick(): void {
+    if (!this.obtenerProcesoActivo() && !this.obtenerProximoProceso() && this.tarjeta.estado === 'finalizada') {
+      this.verResumen();
+      return;
+    }
+    this.tarjetaClick.emit(this.tarjeta);
   }
 }

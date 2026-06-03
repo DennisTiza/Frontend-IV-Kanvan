@@ -1,0 +1,157 @@
+:host {
+    display: block;
+    font-family: 'Inter', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.resumen-card {
+    background: #fff;
+    border: 1px solid #e0e3e5;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
+}
+
+.resumen-titulo {
+    margin: 0 0 24px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #181c1e;
+}
+
+/* CALENDARIO */
+
+.semana-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 28px;
+}
+
+.dia-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 4px;
+    border-radius: 12px;
+    background: #f1f4f6;
+    border: 1px solid #e0e3e5;
+    transition: all .2s;
+    cursor: default;
+}
+
+.dia-card:hover {
+    background: #e5e9eb;
+}
+
+.dia-nombre {
+    font-size: 10px;
+    color: #747780;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.dia-numero {
+    font-size: 18px;
+    font-weight: 700;
+    color: #181c1e;
+}
+
+.dia-badge {
+    background: rgba(30, 91, 184, .1);
+    color: #1e5bb8;
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* HOY */
+
+.hoy {
+    border: 2px solid #00163b;
+    background: rgba(0, 22, 59, .05);
+    transform: scale(1.05);
+}
+
+.dia-hoy {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #00163b;
+}
+
+.dia-circulo {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #00163b;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.badge-hoy {
+    background: #00163b;
+    color: white;
+}
+
+/* ESTADISTICAS */
+
+.estadisticas {
+    border-top: 1px solid #e0e3e5;
+    padding-top: 20px;
+}
+
+.estadisticas-header {
+    font-size: 11px;
+    font-weight: 700;
+    color: #1e5bb8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.stat-card {
+    background: #f1f4f6;
+    border-radius: 12px;
+    padding: 14px;
+}
+
+.stat-label {
+    margin: 0 0 6px;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #747780;
+    letter-spacing: .5px;
+}
+
+.stat-valor {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 800;
+    color: #00163b;
+}
+
+.completadas {
+    color: #1e5bb8;
+}
+
+@media (max-width: 768px) {
+    .semana-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}

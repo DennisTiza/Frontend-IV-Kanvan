@@ -1,13 +1,16 @@
-import { ProcesosXTarjetaModel } from './procesos-x-tarjeta.model';
+import { ProcesoModel } from './proceso.model';
+import { ProcesoXTarjetaModel } from './procesoXTarjeta.model';
 
 export class TarjetaProduccionModel {
     id?: number;
     codigo?: string;
+    fechaPlaneada?: Date;
     fechaInicio?: string;
     fechaFinal?: string;
     productoId?: number;
     productoNombre?: string;
     cantidad?: number;
     estado?: string;
-    procesoXTarjetas?: ProcesosXTarjetaModel[];
+    producto?: { id?: number; nombre?: string };
+    procesoXTarjetas?: ProcesoXTarjetaModel[];
 }

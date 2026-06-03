@@ -1,0 +1,264 @@
+:host {
+	display: block;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+.modal-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 22, 59, 0.4);
+	backdrop-filter: blur(5px);
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	padding: 20px;
+	z-index: 1000;
+}
+
+.modal-container {
+	width: 100%;
+	max-width: 900px;
+
+	background: #ffffff;
+	border-radius: 16px;
+	overflow: hidden;
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+.modal-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 16px;
+
+	padding: 24px 32px;
+	border-bottom: 1px solid #e0e3e5;
+}
+
+.modal-title {
+	margin: 0;
+	font-size: 24px;
+	font-weight: 700;
+	color: #00163b;
+}
+
+.modal-badge-container {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	margin-top: 8px;
+}
+
+.badge {
+	background: #d8e2ff;
+	color: #001a42;
+	padding: 4px 8px;
+	border-radius: 6px;
+	font-size: 12px;
+	font-weight: 700;
+}
+
+.tarjeta-codigo {
+	font-family: monospace;
+	color: #44474f;
+}
+
+.close-btn {
+	border: none;
+	background: transparent;
+	font-size: 20px;
+	line-height: 1;
+	cursor: pointer;
+	color: #5b6168;
+	padding: 4px;
+}
+
+.close-btn:focus-visible,
+.btn-cancelar:focus-visible,
+.btn-guardar:focus-visible,
+.proceso-row input:focus-visible,
+.proceso-row select:focus-visible {
+	outline: 3px solid rgba(30, 91, 184, 0.2);
+	outline-offset: 2px;
+}
+
+.modal-form {
+	display: flex;
+	flex-direction: column;
+}
+
+.modal-body {
+	padding: 32px;
+	max-height: 60vh;
+	overflow-y: auto;
+}
+
+.info-box {
+	display: flex;
+	gap: 12px;
+	padding: 16px;
+	margin-bottom: 24px;
+	background: #f1f4f6;
+	border-radius: 10px;
+	color: #314155;
+}
+
+.info-box p {
+	margin: 0;
+	line-height: 1.5;
+}
+
+.procesos-container {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.proceso-block {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.proceso-row {
+	display: grid;
+	grid-template-columns: 2fr 1fr 2fr;
+	gap: 24px;
+	align-items: end;
+}
+
+.proceso-row label {
+	display: block;
+	margin-bottom: 8px;
+	font-size: 12px;
+	text-transform: uppercase;
+	color: #747780;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+}
+
+.proceso-info span {
+	font-weight: 600;
+	color: #181c1e;
+}
+
+.proceso-row input,
+.proceso-row select {
+	width: 100%;
+	padding: 10px 14px;
+	border: 1px solid #c4c6d0;
+	border-radius: 8px;
+	font-size: 14px;
+	background: #ffffff;
+	color: #181c1e;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.proceso-row input:focus,
+.proceso-row select:focus {
+	outline: none;
+	border-color: #1e5bb8;
+	box-shadow: 0 0 0 3px rgba(30, 91, 184, 0.15);
+}
+
+.proceso-block hr {
+	margin: 0;
+	border: none;
+	border-top: 1px solid #e6e8eb;
+}
+
+.empty-state {
+	padding: 28px 20px;
+	border: 1px dashed #c4c6d0;
+	border-radius: 12px;
+	background: #fbfcfd;
+	text-align: center;
+}
+
+.empty-state h3 {
+	margin: 0 0 8px;
+	font-size: 18px;
+	color: #00163b;
+}
+
+.empty-state p {
+	margin: 0;
+	color: #5b6168;
+	line-height: 1.5;
+}
+
+.modal-footer {
+	display: flex;
+	justify-content: flex-end;
+	gap: 16px;
+	padding: 24px 32px;
+	border-top: 1px solid #e0e3e5;
+	background: #f1f4f6;
+}
+
+.btn-cancelar {
+	border: none;
+	background: transparent;
+	padding: 10px 20px;
+	cursor: pointer;
+	font-weight: 600;
+	color: #374151;
+}
+
+.btn-guardar {
+	border: none;
+	background: #0d2b5b;
+	color: white;
+	padding: 10px 24px;
+	border-radius: 8px;
+	cursor: pointer;
+	font-weight: 600;
+	transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+.btn-guardar:hover:not(:disabled) {
+	opacity: 0.95;
+	transform: translateY(-1px);
+}
+
+.btn-guardar:disabled {
+	background: #9ca3af;
+	cursor: not-allowed;
+	transform: none;
+}
+
+@media (max-width: 768px) {
+	.modal-overlay {
+		padding: 12px;
+	}
+
+	.modal-header,
+	.modal-body,
+	.modal-footer {
+		padding-left: 20px;
+		padding-right: 20px;
+	}
+
+	.proceso-row {
+		grid-template-columns: 1fr;
+		gap: 16px;
+	}
+
+	.modal-container {
+		max-width: 100%;
+	}
+
+	.modal-footer {
+		flex-direction: column-reverse;
+	}
+
+	.btn-cancelar,
+	.btn-guardar {
+		width: 100%;
+	}
+}

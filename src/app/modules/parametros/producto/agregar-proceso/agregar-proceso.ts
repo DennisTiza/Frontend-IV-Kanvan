@@ -15,9 +15,10 @@ import { ProductoXProcesoModel } from '../../../../models/productoXProceso.model
 })
 export class AgregarProceso implements OnInit {
   @Input() productoId: number | undefined;
+  @Input() nextOrden: number = 1;
 
   @Output() cerrado = new EventEmitter<void>();
-  @Output() procesoAgregado = new EventEmitter<void>();
+  @Output() procesoAgregado = new EventEmitter<ProductoXProcesoModel>();
 
   procesoForm: FormGroup;
   listaProcesos: ProcesoModel[] = [];
@@ -31,7 +32,6 @@ export class AgregarProceso implements OnInit {
   ) {
     this.procesoForm = this.fb.group({
       idProceso: ['', Validators.required],
-      orden: ['', [Validators.required, Validators.min(1)]],
     });
   }
 
@@ -50,30 +50,18 @@ export class AgregarProceso implements OnInit {
   }
 
   guardar(): void {
-    if (this.procesoForm.invalid || !this.productoId) {
+    if (this.procesoForm.invalid) {
       this.procesoForm.markAllAsTouched();
       return;
     }
 
-    this.cargando = true;
     const datos: ProductoXProcesoModel = {
       productoId: this.productoId,
       procesoId: Number(this.procesoForm.get('idProceso')?.value),
-      orden: Number(this.procesoForm.get('orden')?.value),
+      orden: this.nextOrden,
     };
 
-    this.productoXProcesoService.RegistrarProductoXProceso(datos).subscribe({
-      next: () => {
-        this.cargando = false;
-        this.procesoAgregado.emit();
-      },
-      error: (err) => {
-        this.cargando = false;
-        console.error('Error al agregar proceso:', err);
-        alert('No se pudo agregar el proceso. Intente nuevamente.');
-        this.cdr.detectChanges();
-      },
-    });
+    this.procesoAgregado.emit(datos);
   }
 
   cerrar(): void {

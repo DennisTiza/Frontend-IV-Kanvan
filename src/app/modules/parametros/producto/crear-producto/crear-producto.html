@@ -74,7 +74,7 @@
             <button type="button" class="btn btn-secondary" (click)="cancelar()">
               Cancelar
             </button>
-            <button type="submit" class="btn btn-primary" [disabled]="productoForm.invalid">
+            <button type="submit" class="btn btn-primary" [disabled]="productoForm.invalid || (productoActual && !hayCambiosSinGuardar)">
               {{ productoActual ? 'Actualizar' : 'Guardar' }}
             </button>
           </div>
@@ -87,8 +87,11 @@
     <!-- COLUMNA DERECHA: TABLA DE PROCESOS -->
     <div>
       <app-listar-proceso-por-producto
-        [productoId]="productoActual?.id"
-        [productoNombre]="productoActual?.nombre">
+        [productoNombre]="productoForm.get('nombre')?.value || productoActual?.nombre"
+        [procesos]="procesosLocales"
+        [deshabilitarAgregar]="!productoActual?.id"
+        (procesosActualizados)="actualizarProcesos($event)"
+        (procesoEliminado)="marcarProcesoEliminar($event)">
       </app-listar-proceso-por-producto>
     </div>
 
