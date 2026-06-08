@@ -43,7 +43,12 @@ export class TarjetaProduccionService {
           scope: {
             include: [
               { relation: 'proceso' },
-              { relation: 'operario' },
+              {
+                relation: 'operarioXProcesoXTarjetas',
+                scope: {
+                  include: [{ relation: 'operario' }]
+                }
+              },
             ],
             order: ['orden ASC'],
           },

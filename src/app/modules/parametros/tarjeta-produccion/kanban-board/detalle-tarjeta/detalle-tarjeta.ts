@@ -43,8 +43,18 @@ export class DetalleTarjetaComponent {
 
   get nombreOperario(): string {
     return this.tarjeta().procesoXTarjetas
-      ?.map((p) => p.operario)
-      .find(Boolean) ? 'Operarios asignados' : 'Sin operarios asignados';
+      ?.some((p) => p.operarioXProcesoXTarjetas && p.operarioXProcesoXTarjetas.length > 0)
+      ? 'Operarios asignados' : 'Sin operarios asignados';
+  }
+
+  obtenerNombresOperarios(proceso: ProcesoXTarjetaModel): string {
+    if (proceso.operarioXProcesoXTarjetas && proceso.operarioXProcesoXTarjetas.length > 0) {
+      return proceso.operarioXProcesoXTarjetas
+        .map(rel => rel.operario ? `${rel.operario.nombre ?? ''} ${rel.operario.apellido ?? ''}`.trim() : '')
+        .filter(name => name.length > 0)
+        .join(', ') || 'Sin asignar';
+    }
+    return 'Sin asignar';
   }
 
   iniciarProceso(procesoId: number | undefined): void {

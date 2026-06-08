@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { ProductoModel } from '../../../../models/producto.model';
 import { OperarioModel } from '../../../../models/operario.model';
@@ -57,7 +57,23 @@ export class CrearTarjetaProduccion implements OnInit {
     productoId: [null as number | null, Validators.required],
     cantidad: [100, [Validators.required, Validators.min(1)]],
     fechaPlaneada: ['', Validators.required],
-  });
+    fechaEntrega: ['', Validators.required],
+  }, { validators: this.validarFechas });
+
+  private validarFechas(group: AbstractControl): ValidationErrors | null {
+    const fechaInicio = group.get('fechaPlaneada')?.value;
+    const fechaEntrega = group.get('fechaEntrega')?.value;
+
+    if (fechaInicio && fechaEntrega) {
+      const inicio = new Date(fechaInicio);
+      const entrega = new Date(fechaEntrega);
+
+      if (inicio >= entrega) {
+        return { fechaInvalida: true };
+      }
+    }
+    return null;
+  }
 
   readonly tarjetasFiltradas = computed(() => {
     const termino = this.filtroBusqueda().trim().toLowerCase();
@@ -130,7 +146,8 @@ export class CrearTarjetaProduccion implements OnInit {
       codigo: tarjeta.codigo ?? '',
       productoId: tarjeta.productoId ?? null,
       cantidad: tarjeta.cantidad ?? 100,
-      fechaPlaneada: this.normalizarFechaInput(tarjeta.fechaPlaneada ?? tarjeta.fechaInicio ?? ''),
+      fechaPlaneada: this.normalizarFechaInput(tarjeta.fechaPlaneada ?? ''),
+      fechaEntrega: this.normalizarFechaInput(tarjeta.fechaEntrega ?? '')
     });
   }
 
@@ -140,7 +157,8 @@ export class CrearTarjetaProduccion implements OnInit {
       codigo: '',
       productoId: null,
       cantidad: 100,
-      fechaPlaneada: ''
+      fechaPlaneada: '',
+      fechaEntrega: ''
     });
   }
 
@@ -158,6 +176,7 @@ export class CrearTarjetaProduccion implements OnInit {
       productoId: formValue.productoId ?? undefined,
       cantidad: formValue.cantidad ?? undefined,
       fechaPlaneada: formValue.fechaPlaneada ? new Date(formValue.fechaPlaneada) : undefined,
+      fechaEntrega: formValue.fechaEntrega ? new Date(formValue.fechaEntrega) : undefined
     };
 
     const estadoActualizado = this.tarjetaSeleccionada()?.estado?.trim();
@@ -272,8 +291,13 @@ export class CrearTarjetaProduccion implements OnInit {
     forkJoin(asignaciones.map((asignacion) => {
       if (asignacion.id) {
         const { id, ...datos } = asignacion;
+        console.log('EDITAR ASIGNACION');
+        console.log(datos);
         return this.procesoXTarjetaService.EditarProcesoTarjeta(String(id), datos);
       }
+
+      console.log('ASIGNACION');
+      console.log(asignacion);
 
       return this.procesoXTarjetaService.RegistrarProcesoTarjeta(asignacion);
     })).subscribe({
@@ -285,6 +309,7 @@ export class CrearTarjetaProduccion implements OnInit {
       },
       error: (error: unknown) => {
         console.error('Error al guardar los procesos de la tarjeta:', error);
+        console.log(asignaciones);
         this.guardandoProcesos.set(false);
       },
     });

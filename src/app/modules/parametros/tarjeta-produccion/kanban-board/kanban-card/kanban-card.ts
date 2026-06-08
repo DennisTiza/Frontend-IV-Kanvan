@@ -130,8 +130,11 @@ export class KanbanCardComponent implements OnInit, OnDestroy {
     const proximo = this.obtenerProximoProceso();
     const activo = this.obtenerProcesoActivo();
     const target = proximo ?? activo;
-    if (target?.operario) {
-      return `${target.operario.nombre ?? ''} ${target.operario.apellido ?? ''}`.trim();
+    if (target?.operarioXProcesoXTarjetas && target.operarioXProcesoXTarjetas.length > 0) {
+      return target.operarioXProcesoXTarjetas
+        .map(rel => rel.operario ? `${rel.operario.nombre ?? ''} ${rel.operario.apellido ?? ''}`.trim() : '')
+        .filter(name => name.length > 0)
+        .join(', ') || 'Sin asignar';
     }
     return 'Sin asignar';
   }

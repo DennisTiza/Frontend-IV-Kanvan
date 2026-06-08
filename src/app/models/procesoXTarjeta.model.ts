@@ -1,15 +1,17 @@
 import { OperarioModel } from "./operario.model";
 import { ProcesoModel } from "./proceso.model";
+import { OperarioXProcesoXTarjetaModel } from "./operarioXProcesoXTarjeta.model";
 
 export class ProcesoXTarjetaModel {
     id?: number;
     procesoId?: number;
     tarjetaDeProduccionId?: number;
-    operarioId?: number;
-    orden?: number;
     tiempo?: number;
     fechaInicio?: string;
     fechaFinal?: string;
-    operario?: OperarioModel;
     proceso?: ProcesoModel;
+    orden?: number;
+    productoXProceso?: { orden?: number };
+    operariosIds?: number[];
+    operarioXProcesoXTarjetas?: OperarioXProcesoXTarjetaModel[];
 }

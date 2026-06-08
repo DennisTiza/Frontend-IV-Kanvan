@@ -8,7 +8,7 @@ import { ProcesoXTarjetaModel } from '../../../../models/procesoXTarjeta.model';
 type ProcesoFormularioGroup = FormGroup<{
   procesoId: FormControl<number | null>;
   tiempo: FormControl<number | null>;
-  operarioId: FormControl<number | null>;
+  operariosIds: FormControl<number[] | null>;
 }>;
 
 @Component({
@@ -66,13 +66,14 @@ export class EditarProcesoProduccion {
     const asignaciones = this.controlesProcesos.map((control, index) => {
       const proceso = this.procesos()[index];
       const valores = control.getRawValue();
-      const asignacionExistente = this.obtenerAsignacionExistente(proceso?.id);
+      const asignacionExistente = this.asignaciones()[index];
 
       return {
         id: asignacionExistente?.id,
         procesoId: valores.procesoId ?? proceso?.id,
-        operarioId: valores.operarioId ?? undefined,
+        operariosIds: valores.operariosIds ?? undefined,
         tiempo: valores.tiempo ?? undefined,
+        orden: index + 1,
         tarjetaDeProduccionId: this.tarjetaId() ?? undefined,
       } satisfies ProcesoXTarjetaModel;
     });
@@ -100,27 +101,29 @@ export class EditarProcesoProduccion {
     const procesosFormArray = this.modalForm.controls.procesos;
     procesosFormArray.clear();
 
-    procesos.forEach((proceso) => {
-      procesosFormArray.push(this.crearProcesoFormulario(proceso, asignaciones));
+    procesos.forEach((proceso, index) => {
+      procesosFormArray.push(this.crearProcesoFormulario(proceso, asignaciones[index]));
     });
   }
 
-  private crearProcesoFormulario(proceso: ProcesoModel, asignaciones: ProcesoXTarjetaModel[]): ProcesoFormularioGroup {
-    const asignacion = asignaciones.find((item) => item.procesoId === proceso.id);
+  private crearProcesoFormulario(proceso: ProcesoModel, asignacion?: ProcesoXTarjetaModel): ProcesoFormularioGroup {
+
+    let operariosAsignados: number[] = [];
+    if (asignacion?.operariosIds) {
+      operariosAsignados = asignacion.operariosIds;
+    } else if (asignacion?.operarioXProcesoXTarjetas) {
+      operariosAsignados = asignacion.operarioXProcesoXTarjetas
+        .map(o => o.operarioId)
+        .filter((id): id is number => id !== undefined);
+    }
 
     return this.fb.group({
       procesoId: new FormControl<number | null>(proceso.id ?? null, { validators: [Validators.required] }),
       tiempo: new FormControl<number | null>(asignacion?.tiempo ?? null, { validators: [Validators.required, Validators.min(1)] }),
-      operarioId: new FormControl<number | null>(asignacion?.operarioId ?? null, { validators: [Validators.required] }),
+      operariosIds: new FormControl<number[]>(operariosAsignados, { validators: [Validators.required] }),
     });
   }
 
-  private obtenerAsignacionExistente(procesoId?: number): ProcesoXTarjetaModel | undefined {
-    if (!procesoId) {
-      return undefined;
-    }
 
-    return this.asignaciones().find((asignacion) => asignacion.procesoId === procesoId);
-  }
 
 }

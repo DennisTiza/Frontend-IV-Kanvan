@@ -24,10 +24,10 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="info-icon-sm"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 {{ proceso.tiempo ?? '-' }} min
               </span>
-              @if (proceso.operario) {
+              @if (proceso.operarioXProcesoXTarjetas && proceso.operarioXProcesoXTarjetas.length > 0) {
                 <span class="proceso-info-item">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="info-icon-sm"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                  {{ proceso.operario.nombre }} {{ proceso.operario.apellido }}
+                  {{ obtenerNombresOperarios(proceso) }}
                 </span>
               }
             </div>

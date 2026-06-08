@@ -30,7 +30,7 @@
 
 				@if (tieneProcesos) {
 					<div class="procesos-container" formArrayName="procesos">
-						@for (procesoControl of controlesProcesos; track trackPorProceso($index); let i = $index) {
+						@for (procesoControl of controlesProcesos; track $index; let i = $index) {
 							<div class="proceso-block">
 								<div class="proceso-row" [formGroupName]="i">
 
@@ -51,9 +51,8 @@
 									</div>
 
 									<div>
-										<label [for]="'operario-' + i">Responsable</label>
-										<select [id]="'operario-' + i" formControlName="operarioId">
-											<option [ngValue]="null" disabled>Seleccionar operario</option>
+										<label [for]="'operarios-' + i">Responsables</label>
+										<select [id]="'operarios-' + i" formControlName="operariosIds" multiple>
 											@for (operario of operarios(); track operario.id) {
 												<option [ngValue]="operario.id">{{ obtenerNombreOperario(operario) }}</option>
 											}

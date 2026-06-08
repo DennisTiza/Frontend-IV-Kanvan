@@ -39,6 +39,27 @@
 				</div>
 
 				<div class="form-group">
+					<label for="fechaPlaneada">Fecha de Inicio</label>
+					<input id="fechaPlaneada" type="date" formControlName="fechaPlaneada"
+						[class.input-error]="tarjetaForm.get('fechaPlaneada')?.invalid && tarjetaForm.get('fechaPlaneada')?.touched" />
+					@if (tarjetaForm.get('fechaPlaneada')?.invalid && tarjetaForm.get('fechaPlaneada')?.touched) {
+					<span class="error-msg">La fecha de inicio es obligatoria.</span>
+					}
+				</div>
+
+				<div class="form-group">
+					<label for="fechaEntrega">Fecha de Entrega</label>
+					<input id="fechaEntrega" type="date" formControlName="fechaEntrega"
+						[class.input-error]="(tarjetaForm.get('fechaEntrega')?.invalid || tarjetaForm.hasError('fechaInvalida')) && tarjetaForm.get('fechaEntrega')?.touched" />
+					@if (tarjetaForm.get('fechaEntrega')?.hasError('required') && tarjetaForm.get('fechaEntrega')?.touched) {
+					<span class="error-msg">La fecha de entrega es obligatoria.</span>
+					}
+					@if (tarjetaForm.hasError('fechaInvalida') && tarjetaForm.get('fechaEntrega')?.touched) {
+					<span class="error-msg">La fecha de entrega debe ser mayor a la fecha de inicio.</span>
+					}
+				</div>
+
+				<div class="form-group">
 					<label for="cantidad">Cantidad a Producir</label>
 					<input id="cantidad" type="number" min="1" formControlName="cantidad"
 						[class.input-error]="tarjetaForm.get('cantidad')?.invalid && tarjetaForm.get('cantidad')?.touched" />
@@ -46,17 +67,6 @@
 					<span class="error-msg">La cantidad debe ser mayor a cero.</span>
 					}
 				</div>
-
-				<div class="form-group">
-					<label for="fechaPlaneada">Fecha Inicio Estimada</label>
-					<input id="fechaPlaneada" type="date" formControlName="fechaPlaneada"
-						[class.input-error]="tarjetaForm.get('fechaPlaneada')?.invalid && tarjetaForm.get('fechaPlaneada')?.touched" />
-					@if (tarjetaForm.get('fechaPlaneada')?.invalid && tarjetaForm.get('fechaPlaneada')?.touched) {
-					<span class="error-msg">La fecha estimada es obligatoria.</span>
-					}
-				</div>
-
-
 
 				<div class="actions full-width">
 					<button type="button" class="btn-secondary" (click)="cancelarEdicion()">Cancelar</button>
