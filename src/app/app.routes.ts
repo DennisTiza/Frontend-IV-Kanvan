@@ -9,6 +9,8 @@ import { CrearProducto } from './modules/parametros/producto/crear-producto/crea
 import { CrearProceso } from './modules/parametros/proceso/crear-proceso/crear-proceso';
 import { CrearTarjetaProduccion } from './modules/parametros/tarjeta-produccion/crear-tarjeta-produccion/crear-tarjeta-produccion';
 import { KanbanBoardComponent } from './modules/parametros/tarjeta-produccion/kanban-board/kanban-board';
+import { CrearCodigo } from './modules/parametros/codigos-de-parada/crear-codigo/crear-codigo';
+import { CrearOperario } from './modules/parametros/operario/crear-operario/crear-operario';
 
 export const routes: Routes = [
     {
@@ -49,6 +51,16 @@ export const routes: Routes = [
     {
         path: 'parametros/tarjeta-produccion/kanban',
         component: KanbanBoardComponent,
+        canActivate: [ValidarSesionActivaGuard, guardarUltimaRutaGuard]
+    },
+    {
+        path: 'parametros/codigos-de-parada/crear-codigo',
+        component: CrearCodigo,
+        canActivate: [ValidarSesionActivaGuard, guardarUltimaRutaGuard]
+    },
+    {
+        path: 'parametros/operario/crear-operario',
+        component: CrearOperario,
         canActivate: [ValidarSesionActivaGuard, guardarUltimaRutaGuard]
     },
     {

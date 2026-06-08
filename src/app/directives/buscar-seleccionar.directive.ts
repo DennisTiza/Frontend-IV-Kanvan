@@ -244,6 +244,8 @@ export class BuscarSeleccionarDirective implements OnInit, OnDestroy {
     this.selectedIndex = -1;
     this.actualizarDropdown();
     this.opcionSeleccionada.emit(opcion);
+    // Quitar el foco del input para que el dropdown no se reabra
+    this.el.blur();
     
     // Activar label de Materialize
     const label = this.container?.querySelector('label');
@@ -365,14 +367,24 @@ export class BuscarSeleccionarDirective implements OnInit, OnDestroy {
         break;
 
       case 'Enter':
-        // Solo prevenir si hay una opción seleccionada
-        if (this.showDropdown && this.selectedIndex >= 0 && this.selectedIndex < this.opcionesFiltradas.length) {
-          event.preventDefault();
-          event.stopPropagation();
-          this.seleccionarOpcion(this.opcionesFiltradas[this.selectedIndex]);
+        if (this.showDropdown) {
+          // Si hay una opción navegada con teclado, seleccionarla
+          if (this.selectedIndex >= 0 && this.selectedIndex < this.opcionesFiltradas.length) {
+            event.preventDefault();
+            event.stopPropagation();
+            this.seleccionarOpcion(this.opcionesFiltradas[this.selectedIndex]);
+          } else if (this.opcionesFiltradas.length > 0) {
+            // Sin navegación: seleccionar automáticamente la primera opción
+            event.preventDefault();
+            event.stopPropagation();
+            this.seleccionarOpcion(this.opcionesFiltradas[0]);
+          } else {
+            // Sin opciones: solo cerrar el dropdown
+            event.preventDefault();
+            this.showDropdown = false;
+            this.actualizarDropdown();
+          }
         }
-        // Si no hay opción seleccionada, NO prevenimos el evento
-        // para que el Enter se propague normalmente y active el (keydown.enter)
         break;
 
       case 'Escape':

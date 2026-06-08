@@ -8,6 +8,7 @@ import { ProcesoModel } from '../../../../models/proceso.model';
 import { ProcesoXTarjetaModel } from '../../../../models/procesoXTarjeta.model';
 import { TarjetaProduccionModel } from '../../../../models/tarjeta-produccion.model';
 import { EditarProcesoProduccion } from '../editar-proceso-produccion/editar-proceso-produccion';
+import { BuscarSeleccionarDirective } from '../../../../directives/buscar-seleccionar.directive';
 import { ResumenAsignaciones } from '../resumen-asignaciones/resumen-asignaciones';
 import { ProductoService } from '../../../../services/parametros/producto.service';
 import { ProductoXProcesoService } from '../../../../services/parametros/producto-xproceso.service';
@@ -21,7 +22,7 @@ import { Paginador } from '../../../../public/componentes/paginador/paginador';
 @Component({
   selector: 'app-crear-tarjeta-produccion',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Paginador, EditarProcesoProduccion, ResumenAsignaciones],
+  imports: [CommonModule, ReactiveFormsModule, Paginador, EditarProcesoProduccion, ResumenAsignaciones, BuscarSeleccionarDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './crear-tarjeta-produccion.html',
   styleUrl: './crear-tarjeta-produccion.css',
@@ -54,11 +55,26 @@ export class CrearTarjetaProduccion implements OnInit {
 
   readonly tarjetaForm = this.fb.group({
     codigo: ['', [Validators.required, Validators.maxLength(30)]],
+    productoTexto: ['', Validators.required],
     productoId: [null as number | null, Validators.required],
     cantidad: [100, [Validators.required, Validators.min(1)]],
     fechaPlaneada: ['', Validators.required],
     fechaEntrega: ['', Validators.required],
   }, { validators: this.validarFechas });
+
+  /** Opciones de texto para la directiva buscar-seleccionar */
+  readonly opcionesProducto = computed(() =>
+    this.productos().map((p) => `${p.codigo ?? ''} - ${p.nombre ?? ''}`.trim())
+  );
+
+  /** Mapea el texto seleccionado al productoId y actualiza el form */
+  onProductoSeleccionado(texto: string): void {
+    const producto = this.productos().find(
+      (p) => `${p.codigo ?? ''} - ${p.nombre ?? ''}`.trim() === texto
+    );
+    this.tarjetaForm.get('productoId')?.setValue(producto?.id ?? null);
+    this.tarjetaForm.get('productoId')?.markAsTouched();
+  }
 
   private validarFechas(group: AbstractControl): ValidationErrors | null {
     const fechaInicio = group.get('fechaPlaneada')?.value;
@@ -142,8 +158,14 @@ export class CrearTarjetaProduccion implements OnInit {
 
   seleccionarTarjeta(tarjeta: TarjetaProduccionModel): void {
     this.tarjetaSeleccionada.set(tarjeta);
+    // Buscar el texto del producto para poblarlo en el campo de la directiva
+    const producto = this.productos().find((p) => p.id === tarjeta.productoId);
+    const productoTexto = producto
+      ? `${producto.codigo ?? ''} - ${producto.nombre ?? ''}`.trim()
+      : '';
     this.tarjetaForm.patchValue({
       codigo: tarjeta.codigo ?? '',
+      productoTexto,
       productoId: tarjeta.productoId ?? null,
       cantidad: tarjeta.cantidad ?? 100,
       fechaPlaneada: this.normalizarFechaInput(tarjeta.fechaPlaneada ?? ''),
@@ -155,6 +177,7 @@ export class CrearTarjetaProduccion implements OnInit {
     this.tarjetaSeleccionada.set(null);
     this.tarjetaForm.reset({
       codigo: '',
+      productoTexto: '',
       productoId: null,
       cantidad: 100,
       fechaPlaneada: '',
@@ -318,6 +341,7 @@ export class CrearTarjetaProduccion implements OnInit {
   private normalizarFechaInput(fecha: string | Date | undefined): string {
     if (!fecha) return '';
 
+    // Si ya es un objeto Date, usar métodos locales directamente
     if (fecha instanceof Date) {
       const year = fecha.getFullYear();
       const month = String(fecha.getMonth() + 1).padStart(2, '0');
@@ -325,11 +349,31 @@ export class CrearTarjetaProduccion implements OnInit {
       return `${year}-${month}-${day}`;
     }
 
+    // Si ya es solo fecha YYYY-MM-DD, devolverla tal cual
     if (/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
       return fecha;
     }
 
-    const date = new Date(fecha);
+    // Si viene como ISO con parte de tiempo (ej: "2024-06-15T00:00:00.000Z"),
+    // extraer solo la parte YYYY-MM-DD sin construir un Date (evita desfase UTC→local)
+    if (fecha.includes('T')) {
+      const soloFecha = fecha.split('T')[0];
+      if (/^\d{4}-\d{2}-\d{2}$/.test(soloFecha)) {
+        return soloFecha;
+      }
+    }
+
+    // Si viene con espacio como separador (ej: "2024-06-15 00:00:00")
+    if (fecha.includes(' ')) {
+      const soloFecha = fecha.split(' ')[0];
+      if (/^\d{4}-\d{2}-\d{2}$/.test(soloFecha)) {
+        return soloFecha;
+      }
+    }
+
+    // Fallback: construir Date solo si no hay otra forma
+    // Forzar interpretación local añadiendo T00:00:00 sin zona
+    const date = new Date(fecha.substring(0, 10) + 'T00:00:00');
     if (Number.isNaN(date.getTime())) return '';
 
     const year = date.getFullYear();

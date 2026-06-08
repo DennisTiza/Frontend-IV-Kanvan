@@ -97,6 +97,26 @@ export class EditarProcesoProduccion {
     return [operario.nombre, operario.apellido].filter(Boolean).join(' ').trim() || 'Operario sin nombre';
   }
 
+  estaSeleccionado(procesoControl: ProcesoFormularioGroup, operarioId: number | undefined): boolean {
+    if (operarioId === undefined) return false;
+    const ids: number[] = procesoControl.controls.operariosIds.value ?? [];
+    return ids.includes(operarioId);
+  }
+
+  toggleOperario(procesoControl: ProcesoFormularioGroup, operarioId: number | undefined): void {
+    if (operarioId === undefined) return;
+    const control = procesoControl.controls.operariosIds;
+    const ids: number[] = [...(control.value ?? [])];
+    const idx = ids.indexOf(operarioId);
+    if (idx === -1) {
+      ids.push(operarioId);
+    } else {
+      ids.splice(idx, 1);
+    }
+    control.setValue(ids);
+    control.markAsTouched();
+  }
+
   private reconstruirFormulario(procesos: ProcesoModel[], asignaciones: ProcesoXTarjetaModel[]): void {
     const procesosFormArray = this.modalForm.controls.procesos;
     procesosFormArray.clear();

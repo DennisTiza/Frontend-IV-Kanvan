@@ -25,10 +25,22 @@ export namespace ConfiguracionMenu {
             accion: "Guardar"
         },
         {
+            id: "5",
+            titulo: "Codigos de Parada",
+            ruta: "/parametros/codigos-de-parada/crear-codigo",
+            accion: "Guardar"
+        },
+        {
             id: "8",
             titulo: "Tablero Kanban",
             ruta: "/parametros/tarjeta-produccion/kanban",
             accion: "Listar"
-        }
+        },
+        {
+            id: "9",
+            titulo: "Operarios",
+            ruta: "/parametros/operario/crear-operario",
+            accion: "Guardar"
+        },
     ];
 }

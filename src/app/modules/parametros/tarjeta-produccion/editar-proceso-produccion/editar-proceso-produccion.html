@@ -1,14 +1,14 @@
 @if (abierto()) {
 <div class="modal-overlay" id="modal-overlay" role="presentation" (click)="cerrarModal()">
-	<div class="modal-container" role="dialog" aria-modal="true" aria-labelledby="modal-titulo" aria-describedby="modal-descripcion" (click)="$event.stopPropagation()">
+	<div class="modal-container" role="dialog" aria-modal="true" aria-labelledby="modal-titulo"
+		aria-describedby="modal-descripcion" (click)="$event.stopPropagation()">
 
 		<div class="modal-header">
 			<div>
 				<h2 class="modal-title" id="modal-titulo">{{ titulo() }}</h2>
 
 				<div class="modal-badge-container">
-					<span class="badge">TARJETA</span>
-					<span class="tarjeta-codigo">{{ tarjetaCodigo() || 'TP-2024-001' }}</span>
+					<span class="badge">{{tarjetaCodigo()}}</span>
 				</div>
 			</div>
 
@@ -21,7 +21,6 @@
 			<div class="modal-body">
 
 				<div class="info-box" id="modal-descripcion">
-					<span aria-hidden="true">ℹ️</span>
 					<p>
 						Define los tiempos estimados y asigna el personal responsable
 						para cada fase de la producción.
@@ -29,49 +28,54 @@
 				</div>
 
 				@if (tieneProcesos) {
-					<div class="procesos-container" formArrayName="procesos">
-						@for (procesoControl of controlesProcesos; track $index; let i = $index) {
-							<div class="proceso-block">
-								<div class="proceso-row" [formGroupName]="i">
+				<div class="procesos-container" formArrayName="procesos">
+					@for (procesoControl of controlesProcesos; track $index; let i = $index) {
+					<div class="proceso-block">
+						<div class="proceso-row" [formGroupName]="i">
 
-									<div class="proceso-info">
-										<label>Proceso</label>
-										<span>{{ obtenerNombreProceso(procesos()[i]) }}</span>
-									</div>
-
-									<div>
-										<label [for]="'tiempo-' + i">Tiempo (Min)</label>
-										<input
-											[id]="'tiempo-' + i"
-											type="number"
-											min="1"
-											placeholder="45"
-											formControlName="tiempo"
-										/>
-									</div>
-
-									<div>
-										<label [for]="'operarios-' + i">Responsables</label>
-										<select [id]="'operarios-' + i" formControlName="operariosIds" multiple>
-											@for (operario of operarios(); track operario.id) {
-												<option [ngValue]="operario.id">{{ obtenerNombreOperario(operario) }}</option>
-											}
-										</select>
-									</div>
-
-								</div>
-
-								@if (i < controlesProcesos.length - 1) {
-									<hr>
-								}
+							<div class="proceso-info">
+								<label>Proceso</label>
+								<span>{{ obtenerNombreProceso(procesos()[i]) }}</span>
 							</div>
-						}
+
+							<div>
+								<label [for]="'tiempo-' + i">Tiempo (Min)</label>
+								<input [id]="'tiempo-' + i" type="number" min="1" placeholder="45"
+									formControlName="tiempo" />
+							</div>
+
+							<div>
+								<label>Responsables</label>
+								<div class="operarios-lista" [id]="'operarios-' + i">
+									@for (operario of operarios(); track operario.id) {
+									<button type="button" class="operario-item"
+										[class.operario-seleccionado]="estaSeleccionado(procesoControl, operario.id)"
+										(click)="toggleOperario(procesoControl, operario.id)">
+										<span class="operario-check">
+											@if (estaSeleccionado(procesoControl, operario.id)) { ✓ }
+										</span>
+										{{ obtenerNombreOperario(operario) }}
+									</button>
+									}
+									@if (operarios().length === 0) {
+									<span class="operarios-vacio">Sin operarios disponibles</span>
+									}
+								</div>
+							</div>
+
+						</div>
+
+						@if (i < controlesProcesos.length - 1) { <hr>
+							}
 					</div>
+					}
+				</div>
 				} @else {
-					<div class="empty-state">
-						<h3>No hay procesos disponibles</h3>
-						<p>Cuando la tarjeta tenga procesos configurados, aparecerán aquí para asignar tiempo y responsable.</p>
-					</div>
+				<div class="empty-state">
+					<h3>No hay procesos disponibles</h3>
+					<p>Cuando la tarjeta tenga procesos configurados, aparecerán aquí para asignar tiempo y responsable.
+					</p>
+				</div>
 				}
 
 			</div>
@@ -82,7 +86,8 @@
 					Cancelar
 				</button>
 
-				<button class="btn-guardar" type="submit" [disabled]="modalForm.invalid || cargando() || !tieneProcesos">
+				<button class="btn-guardar" type="submit"
+					[disabled]="modalForm.invalid || cargando() || !tieneProcesos">
 					{{ cargando() ? 'Guardando...' : 'Finalizar Asignación' }}
 				</button>
 

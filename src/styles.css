@@ -13,3 +13,90 @@ app-root {
 	display: block;
 	min-height: 100%;
 }
+
+/* ============================================================
+   BUSCAR-SELECCIONAR DIRECTIVE — estilos globales del dropdown
+   (el dropdown se agrega al body con Renderer2)
+   ============================================================ */
+
+.search-select-dropdown {
+	font-family: 'Inter', sans-serif;
+	background: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 12px;
+	box-shadow:
+		0 4px 6px -1px rgba(0, 0, 0, 0.07),
+		0 10px 24px -4px rgba(0, 0, 0, 0.12);
+	overflow: hidden;
+	overflow-y: auto;
+	animation: dropdown-in 0.15s ease;
+	scrollbar-width: thin;
+	scrollbar-color: #d1d5db transparent;
+}
+
+.search-select-dropdown::-webkit-scrollbar {
+	width: 6px;
+}
+
+.search-select-dropdown::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.search-select-dropdown::-webkit-scrollbar-thumb {
+	background: #d1d5db;
+	border-radius: 10px;
+}
+
+@keyframes dropdown-in {
+	from {
+		opacity: 0;
+		transform: translateY(-4px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.search-select-option {
+	display: flex;
+	align-items: center;
+	padding: 10px 16px;
+	cursor: pointer;
+	font-size: 14px;
+	font-weight: 500;
+	color: #111827;
+	border-bottom: 1px solid #f3f4f6;
+	transition: background-color 0.12s ease, color 0.12s ease;
+	user-select: none;
+}
+
+.search-select-option:last-child {
+	border-bottom: none;
+}
+
+.search-select-option:hover {
+	background-color: #fff1f2;
+	color: #b70619;
+}
+
+/* Opción resaltada con teclado (ArrowUp / ArrowDown) */
+.search-select-option.keyboard-selected {
+	background-color: #b70619;
+	color: #ffffff;
+}
+
+.search-select-option .option-name {
+	flex: 1;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.no-results {
+	padding: 16px;
+	text-align: center;
+	font-size: 13px;
+	color: #9ca3af;
+	font-style: italic;
+}

@@ -23,20 +23,22 @@
 				</div>
 
 				<div class="form-group">
-					<label for="productoId">Producto / Referencia</label>
-					<select id="productoId" formControlName="productoId"
-						[class.input-error]="tarjetaForm.get('productoId')?.invalid && tarjetaForm.get('productoId')?.touched">
-						<option [ngValue]="null">Seleccione un producto...</option>
-						@for (producto of productos(); track producto.id) {
-						<option [ngValue]="producto.id">
-							{{ producto.codigo }} - {{ producto.nombre }}
-						</option>
-						}
-					</select>
-					@if (tarjetaForm.get('productoId')?.invalid && tarjetaForm.get('productoId')?.touched) {
-					<span class="error-msg">Seleccione un producto.</span>
-					}
-				</div>
+				<label for="productoTexto">Producto / Referencia</label>
+				<input
+					id="productoTexto"
+					type="text"
+					formControlName="productoTexto"
+					appBuscarSeleccionar
+					[opciones]="opcionesProducto()"
+					[permitirPersonalizado]="false"
+					placeholder="Buscar producto..."
+					(opcionSeleccionada)="onProductoSeleccionado($event)"
+					[class.input-error]="tarjetaForm.get('productoTexto')?.invalid && tarjetaForm.get('productoTexto')?.touched"
+				/>
+				@if (tarjetaForm.get('productoTexto')?.invalid && tarjetaForm.get('productoTexto')?.touched) {
+				<span class="error-msg">Seleccione un producto.</span>
+				}
+			</div>
 
 				<div class="form-group">
 					<label for="fechaPlaneada">Fecha de Inicio</label>
