@@ -55,6 +55,7 @@ export class KanbanBoardComponent implements OnInit {
     procesoId: number;
     cantidadReportada?: number;
     codigoDeParadaId?: number;
+    operarioId?: number;
   }): void {
     let accion: Observable<any>;
 
@@ -65,13 +66,13 @@ export class KanbanBoardComponent implements OnInit {
       case 'finalizar':
         accion = this.procesoXTarjetaService.FinalizarProceso(
           evento.procesoId,
-          evento.cantidadReportada !== undefined ? { cantidadReportada: evento.cantidadReportada } : undefined
+          evento.cantidadReportada !== undefined ? { cantidadReportada: evento.cantidadReportada, operarioId: evento.operarioId } : undefined
         );
         break;
       case 'registrar-parada':
         accion = this.procesoXTarjetaService.RegistrarParada(
           evento.procesoId,
-          { cantidadReportada: evento.cantidadReportada!, codigoDeParadaId: evento.codigoDeParadaId! }
+          { cantidadReportada: evento.cantidadReportada!, codigoDeParadaId: evento.codigoDeParadaId!, operarioId: evento.operarioId! }
         );
         break;
       default:

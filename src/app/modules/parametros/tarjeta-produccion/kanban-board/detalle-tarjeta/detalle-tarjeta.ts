@@ -27,6 +27,7 @@ export class DetalleTarjetaComponent implements OnInit, OnDestroy {
     procesoId: number;
     cantidadReportada?: number;
     codigoDeParadaId?: number;
+    operarioId?: number;
   }>();
 
   readonly codigosDeParada = signal<CodigoDeParadaModel[]>([]);
@@ -34,6 +35,7 @@ export class DetalleTarjetaComponent implements OnInit, OnDestroy {
   readonly paradasVisibles = signal<number | null>(null);
   readonly paradasMap = signal<Map<number, ParadaModel[]>>(new Map());
   readonly procesoInputs = signal<Map<number, number>>(new Map());
+  readonly operarioSeleccionado = signal<Map<number, number | null>>(new Map());
   readonly codigoSeleccionado = signal<number | null>(null);
   readonly guardando = signal(false);
   readonly mostrarModalLimite = signal(false);
@@ -55,13 +57,16 @@ export class DetalleTarjetaComponent implements OnInit, OnDestroy {
 
   private initProcesoInputs(): void {
     const procesos = this.tarjeta().procesoXTarjetas ?? [];
-    const map = new Map<number, number>();
+    const inputMap = new Map<number, number>();
+    const operarioMap = new Map<number, number | null>();
     for (const p of procesos) {
       if (p.id != null) {
-        map.set(p.id, p.cantidadRegistrada ?? 0);
+        inputMap.set(p.id, p.cantidadRegistrada ?? 0);
+        operarioMap.set(p.id, null);
       }
     }
-    this.procesoInputs.set(map);
+    this.procesoInputs.set(inputMap);
+    this.operarioSeleccionado.set(operarioMap);
   }
 
   private iniciarTimer(): void {
@@ -131,16 +136,28 @@ export class DetalleTarjetaComponent implements OnInit, OnDestroy {
 
   puedeRegistrarParada(proceso: ProcesoXTarjetaModel): boolean {
     if (!this.esActivo(proceso)) return false;
-    const input = this.getInputValue(proceso.id ?? 0);
+    const id = proceso.id ?? 0;
+    const input = this.getInputValue(id);
     const maxPermitido = this.getMaxPermitido(proceso);
-    return input > (proceso.cantidadRegistrada ?? 0) && input <= maxPermitido && input < (proceso.cantidad ?? 0);
+    const tieneDelta = input > (proceso.cantidadRegistrada ?? 0);
+    const tieneOperario = this.operarioSeleccionado().get(id) != null;
+    const tieneOperarios = (proceso.operarioXProcesoXTarjetas?.length ?? 0) > 0;
+    return tieneDelta && input <= maxPermitido && input < (proceso.cantidad ?? 0) && tieneOperario && tieneOperarios;
   }
 
   puedeFinalizar(proceso: ProcesoXTarjetaModel): boolean {
     if (proceso.fechaFinal) return false;
     if (!proceso.fechaInicio) return false;
-    const input = this.getInputValue(proceso.id ?? 0);
-    return input === (proceso.cantidad ?? 0);
+    const id = proceso.id ?? 0;
+    const input = this.getInputValue(id);
+    if (input !== (proceso.cantidad ?? 0)) return false;
+    const registrada = proceso.cantidadRegistrada ?? 0;
+    if (input > registrada) {
+      const tieneOperario = this.operarioSeleccionado().get(id) != null;
+      const tieneOperarios = (proceso.operarioXProcesoXTarjetas?.length ?? 0) > 0;
+      return tieneOperario && tieneOperarios;
+    }
+    return true;
   }
 
   puedeAcceder(_proceso: ProcesoXTarjetaModel): boolean {
@@ -181,7 +198,8 @@ export class DetalleTarjetaComponent implements OnInit, OnDestroy {
     const cantidadRegistrada = proceso.cantidadRegistrada ?? 0;
     const input = this.getInputValue(id);
     const cantidadReportada = input - cantidadRegistrada;
-    this.procesoAccion.emit({ tipo: 'finalizar', procesoId: id, cantidadReportada });
+    const operarioId = this.operarioSeleccionado().get(id) ?? undefined;
+    this.procesoAccion.emit({ tipo: 'finalizar', procesoId: id, cantidadReportada, operarioId: cantidadReportada > 0 ? operarioId : undefined });
   }
 
   registrarParada(proceso: ProcesoXTarjetaModel): void {
@@ -192,7 +210,8 @@ export class DetalleTarjetaComponent implements OnInit, OnDestroy {
     const cantidadRegistrada = proceso.cantidadRegistrada ?? 0;
     const input = this.getInputValue(id);
     const cantidadReportada = input - cantidadRegistrada;
-    this.procesoAccion.emit({ tipo: 'registrar-parada', procesoId: id, cantidadReportada, codigoDeParadaId });
+    const operarioId = this.operarioSeleccionado().get(id)!;
+    this.procesoAccion.emit({ tipo: 'registrar-parada', procesoId: id, cantidadReportada, codigoDeParadaId, operarioId });
   }
 
   getDelta(proceso: ProcesoXTarjetaModel): number {
@@ -285,6 +304,23 @@ export class DetalleTarjetaComponent implements OnInit, OnDestroy {
   onCodigoSeleccionado(event: Event): void {
     const value = (event.target as HTMLSelectElement).value;
     this.codigoSeleccionado.set(value ? parseInt(value, 10) : null);
+  }
+
+  onOperarioChange(procesoId: number, event: Event): void {
+    const value = (event.target as HTMLSelectElement).value;
+    const map = new Map(this.operarioSeleccionado());
+    map.set(procesoId, value ? parseInt(value, 10) : null);
+    this.operarioSeleccionado.set(map);
+  }
+
+  getOperarios(proceso: ProcesoXTarjetaModel): { id: number; nombre: string }[] {
+    return proceso.operarioXProcesoXTarjetas
+      ?.filter(rel => rel.operario != null)
+      .map(rel => ({
+        id: rel.operario!.id ?? 0,
+        nombre: `${rel.operario!.nombre ?? ''} ${rel.operario!.apellido ?? ''}`.trim(),
+      }))
+      .filter(op => op.id > 0) ?? [];
   }
 
   cerrarModal(): void {

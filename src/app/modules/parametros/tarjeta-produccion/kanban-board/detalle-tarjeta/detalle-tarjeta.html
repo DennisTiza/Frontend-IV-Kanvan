@@ -82,6 +82,28 @@
                     <span class="input-delta">(+{{ getDelta(proceso) }})</span>
                   }
                 </div>
+                @if (inputValue > cantidadReg) {
+                  @let operarios = getOperarios(proceso);
+                  <div class="operario-select-container">
+                    <label class="input-label">Operario:</label>
+                    @if (operarios.length > 0) {
+                      <select
+                        class="operario-select"
+                        [value]="operarioSeleccionado().get(procesoId) ?? ''"
+                        (change)="onOperarioChange(procesoId, $event)"
+                      >
+                        <option value="" disabled selected>Seleccionar operario...</option>
+                        @for (op of operarios; track op.id) {
+                          <option [value]="op.id">{{ op.nombre }}</option>
+                        }
+                      </select>
+                    } @else {
+                      <select class="operario-select" disabled>
+                        <option value="" selected>Sin operarios asignados</option>
+                      </select>
+                    }
+                  </div>
+                }
               }
 
               <div class="proceso-accion">
@@ -153,7 +175,7 @@
                     <button class="btn-accion btn-cancelar" (click)="toggleExpandirParada(proceso)">Cancelar</button>
                     <button
                       class="btn-accion btn-guardar"
-                      [disabled]="!codigoSeleccionado() || guardando()"
+                      [disabled]="!codigoSeleccionado() || guardando() || !operarioSeleccionado().get(procesoId)"
                       (click)="registrarParada(proceso)"
                     >
                       {{ guardando() ? 'Guardando...' : 'Guardar' }}
@@ -172,6 +194,9 @@
                         <span class="parada-item-fecha">{{ parada.fecha ? (parada.fecha | date:'HH:mm') : '--:--' }}</span>
                         <span class="parada-item-codigo">{{ parada.codigoDeParada?.descripcion ?? parada.codigoDeParada?.codigo ?? 'Sin código' }}</span>
                         <span class="parada-item-cantidad">{{ parada.cantidadReportada ?? 0 }} uds</span>
+                        @if (parada.operario) {
+                          <span class="parada-item-operario">{{ parada.operario.nombre }}</span>
+                        }
                       </div>
                     }
                     <div class="parada-total">

@@ -1,13 +1,14 @@
 import { CodigoDeParadaModel } from "./codigoDeParada.model";
 import { OperarioModel } from "./operario.model";
 
-export class ParadaModel {
+export class RegistroDeCantidadModel {
     id?: number;
     procesoXTarjetaId?: number;
-    codigoDeParadaId?: number;
-    cantidadReportada?: number;
     operarioId?: number;
+    cantidad?: number;
+    tipo?: 'produccion' | 'parada';
+    codigoDeParadaId?: number | null;
     fecha?: string;
-    codigoDeParada?: CodigoDeParadaModel;
     operario?: OperarioModel;
+    codigoDeParada?: CodigoDeParadaModel | null;
 }
