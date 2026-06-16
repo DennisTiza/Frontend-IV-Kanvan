@@ -4,6 +4,7 @@
       <div class="modal-header-left">
         <h2 class="modal-titulo">{{ tarjeta().codigo }}</h2>
         <span class="modal-producto">{{ tarjeta().productoNombre }}</span>
+        <span class="modal-cantidad">{{ tarjeta().cantidad ?? 0 }} unidades</span>
       </div>
       <button class="modal-close-btn" (click)="cerrarModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="close-icon"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -13,45 +14,176 @@
     <div class="modal-body">
       <div class="procesos-lista">
         @for (proceso of tarjeta().procesoXTarjetas; track proceso.id) {
-          <div class="proceso-item {{ obtenerEstado(proceso).clase }}">
-            <div class="proceso-item-header">
-              <span class="proceso-nombre">{{ proceso.proceso?.nombre ?? 'Sin nombre' }}</span>
-              <span class="proceso-badge {{ obtenerEstado(proceso).clase }}-badge">{{ obtenerEstado(proceso).texto }}</span>
-            </div>
+          @if (proceso.id != null) {
+            @let procesoId = proceso.id;
+            @let esActivo = !!proceso.fechaInicio && !proceso.fechaFinal;
+            @let esCompletado = !!proceso.fechaFinal;
+            @let cantidadTotal = proceso.cantidad ?? 0;
+            @let cantidadReg = proceso.cantidadRegistrada ?? 0;
+            @let inputValue = getInputValue(procesoId);
+            @let puedeParada = puedeRegistrarParada(proceso);
+            @let puedeFin = puedeFinalizar(proceso);
+            @let puedeIniRea = puedeIniciarReanudar(proceso);
+            @let tooltip = mostrarTooltipBloqueado(proceso);
+            @let tieneParadasProceso = tieneParadas(proceso);
+            @let maxPermitido = getMaxPermitido(proceso);
+            @let restantes = cantidadTotal - cantidadReg;
 
-            <div class="proceso-info">
-              <span class="proceso-info-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="info-icon-sm"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                {{ proceso.tiempo ?? '-' }} min
-              </span>
-              @if (proceso.operarioXProcesoXTarjetas && proceso.operarioXProcesoXTarjetas.length > 0) {
-                <span class="proceso-info-item">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="info-icon-sm"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                  {{ obtenerNombresOperarios(proceso) }}
+            <div class="proceso-item {{ obtenerEstado(proceso).clase }}">
+              <div class="proceso-item-header">
+                <span class="proceso-nombre">{{ proceso.proceso?.nombre ?? 'Sin nombre' }}</span>
+                <span class="proceso-badge {{ obtenerEstado(proceso).clase }}-badge">
+                  {{ obtenerEstado(proceso).texto }}
+                  @if (tieneParadasProceso) { ⚠️ }
                 </span>
-              }
-            </div>
+              </div>
 
-            <div class="proceso-accion">
-              @if (puedeIniciar(proceso)) {
-                <button class="btn-accion btn-iniciar" (click)="iniciarProceso(proceso.id)">
-                  Iniciar proceso
-                </button>
-              } @else if (puedeFinalizar(proceso)) {
-                <button class="btn-accion btn-finalizar" (click)="finalizarProceso(proceso.id)">
-                  Finalizar proceso
-                </button>
-              } @else if (proceso.fechaFinal) {
-                <button class="btn-accion btn-completado" disabled>
-                  Completado
-                </button>
-              } @else {
-                <button class="btn-accion btn-bloqueado" disabled>
-                  Bloqueado
-                </button>
+              <div class="proceso-info">
+                <span class="proceso-info-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="info-icon-sm"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  {{ proceso.tiempo ?? '-' }} min
+                  @let tiempoReal = getTiempoConsumidoDisplay(proceso);
+                  @if (tiempoReal) {
+                    <span class="proceso-info-item">| real: {{ tiempoReal }}</span>
+                  }
+                  @if (esActivo && proceso.tiempo) {
+                    <span class="proceso-info-item">| ⏱ {{ getTiempoRestanteDisplay(proceso) }}</span>
+                  }
+                </span>
+                @if (proceso.operarioXProcesoXTarjetas && proceso.operarioXProcesoXTarjetas.length > 0) {
+                  <span class="proceso-info-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="info-icon-sm"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    {{ obtenerNombresOperarios(proceso) }}
+                  </span>
+                }
+              </div>
+
+              <div class="progreso-cantidad">
+                <div class="progreso-barra-container">
+                  <div class="progreso-barra-fill" [style.width.%]="getBarraPorcentaje(proceso)"></div>
+                </div>
+                <span class="progreso-texto">{{ cantidadReg }}/{{ cantidadTotal }} ({{ restantes }} restantes)</span>
+              </div>
+
+              @if (esActivo) {
+                <div class="proceso-input-row">
+                  <label class="input-label">Procesado:</label>
+                  <input
+                    type="number"
+                    class="cantidad-input"
+                    [min]="cantidadReg"
+                    [max]="maxPermitido"
+                    [value]="inputValue"
+                    (change)="onInputChange(procesoId, $event)"
+                    (input)="onInputChange(procesoId, $event)"
+                  />
+                  <span class="input-sufijo">de <b>{{ cantidadTotal }}</b> uds</span>
+                  @if (inputValue > cantidadReg) {
+                    <span class="input-delta">(+{{ getDelta(proceso) }})</span>
+                  }
+                </div>
+              }
+
+              <div class="proceso-accion">
+                @if (puedeIniRea) {
+                  <button
+                    class="btn-accion btn-iniciar"
+                    (click)="iniciarProceso(procesoId)"
+                    [title]="tooltip"
+                  >
+                    {{ getTextoBotonIniciar(proceso) }}
+                  </button>
+                }
+
+                @if (puedeParada) {
+                  <button
+                    class="btn-accion btn-parada"
+                    (click)="toggleExpandirParada(proceso)"
+                  >
+                    ⏸ Registrar Parada
+                  </button>
+                }
+
+                @if (puedeFin) {
+                  <button
+                    class="btn-accion btn-finalizar"
+                    (click)="finalizarProceso(proceso)"
+                  >
+                    Finalizar
+                  </button>
+                }
+
+                @if (!puedeIniRea && !puedeParada && !puedeFin && esCompletado) {
+                  <button class="btn-accion btn-completado" disabled>
+                    Completado
+                  </button>
+                }
+
+                @if (tieneParadasProceso) {
+                  <button
+                    class="btn-accion btn-ver-paradas"
+                    (click)="toggleParadasVisibles(proceso)"
+                  >
+                    {{ paradasVisibles() === procesoId ? 'Ocultar paradas' : 'Ver paradas' }}
+                  </button>
+                }
+              </div>
+
+              @if (procesoExpandido() === procesoId) {
+                <div class="parada-form">
+                  <div class="parada-form-field">
+                    <label class="parada-form-label">Unidades a reportar:</label>
+                    <span class="parada-form-valor">{{ getDelta(proceso) }} uds</span>
+                  </div>
+                  <div class="parada-form-field">
+                    <label class="parada-form-label" for="codigo-{{procesoId}}">Código de parada:</label>
+                    <select
+                      id="codigo-{{procesoId}}"
+                      class="parada-select"
+                      [value]="codigoSeleccionado() ?? ''"
+                      (change)="onCodigoSeleccionado($event)"
+                    >
+                      <option value="" disabled selected>Seleccionar código de parada...</option>
+                      @for (codigo of codigosDeParada(); track codigo.id) {
+                        <option [value]="codigo.id">{{ codigo.descripcion ?? codigo.codigo }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div class="parada-form-actions">
+                    <button class="btn-accion btn-cancelar" (click)="toggleExpandirParada(proceso)">Cancelar</button>
+                    <button
+                      class="btn-accion btn-guardar"
+                      [disabled]="!codigoSeleccionado() || guardando()"
+                      (click)="registrarParada(proceso)"
+                    >
+                      {{ guardando() ? 'Guardando...' : 'Guardar' }}
+                    </button>
+                  </div>
+                </div>
+              }
+
+              @if (paradasVisibles() === procesoId) {
+                <div class="paradas-historial">
+                  <div class="paradas-historial-header">Paradas registradas:</div>
+                  @let paradas = getParadas(procesoId);
+                  @if (paradas.length > 0) {
+                    @for (parada of paradas; track parada.id) {
+                      <div class="parada-item">
+                        <span class="parada-item-fecha">{{ parada.fecha ? (parada.fecha | date:'HH:mm') : '--:--' }}</span>
+                        <span class="parada-item-codigo">{{ parada.codigoDeParada?.descripcion ?? parada.codigoDeParada?.codigo ?? 'Sin código' }}</span>
+                        <span class="parada-item-cantidad">{{ parada.cantidadReportada ?? 0 }} uds</span>
+                      </div>
+                    }
+                    <div class="parada-total">
+                      Total: {{ paradas.reduce((sum, p) => sum + (p.cantidadReportada ?? 0), 0) }} uds registrados
+                    </div>
+                  } @else {
+                    <div class="parada-item parada-vacia">No hay paradas registradas</div>
+                  }
+                </div>
               }
             </div>
-          </div>
+          }
         } @empty {
           <div class="sin-procesos">Esta tarjeta no tiene procesos asignados.</div>
         }
@@ -59,3 +191,13 @@
     </div>
   </div>
 </div>
+
+@if (mostrarModalLimite()) {
+  <div class="modal-overlay modal-overlay-advertencia" (click)="mostrarModalLimite.set(false)">
+    <div class="modal-advertencia" (click)="$event.stopPropagation()">
+      <div class="modal-advertencia-icono">!</div>
+      <p class="modal-advertencia-texto">No se puede colocar una cantidad mayor a la del proceso anterior.</p>
+      <button class="btn-accion btn-cancelar" (click)="mostrarModalLimite.set(false)">Aceptar</button>
+    </div>
+  </div>
+}
