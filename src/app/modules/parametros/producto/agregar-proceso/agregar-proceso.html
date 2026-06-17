@@ -22,18 +22,19 @@
 
       <!-- Proceso -->
       <div class="form-group">
-        <label class="label" for="idProceso">Proceso</label>
-        <select
-          id="idProceso"
-          formControlName="idProceso"
+        <label class="label" for="procesoTexto">Proceso</label>
+        <input
+          id="procesoTexto"
+          type="text"
+          formControlName="procesoTexto"
+          appBuscarSeleccionar
+          [opciones]="opcionesProceso"
+          [permitirPersonalizado]="false"
+          placeholder="Buscar proceso..."
+          (opcionSeleccionada)="onProcesoSeleccionado($event)"
           class="input"
-          [class.input-error]="procesoForm.get('idProceso')?.invalid && procesoForm.get('idProceso')?.touched">
-          <option value="" disabled selected>Seleccione un proceso...</option>
-          @for (proceso of listaProcesos; track proceso.id) {
-            <option [value]="proceso.id">{{ proceso.nombre }} ({{ proceso.codigo }})</option>
-          }
-        </select>
-        @if (procesoForm.get('idProceso')?.invalid && procesoForm.get('idProceso')?.touched) {
+          [class.input-error]="procesoForm.get('procesoTexto')?.invalid && procesoForm.get('procesoTexto')?.touched" />
+        @if (procesoForm.get('procesoTexto')?.invalid && procesoForm.get('procesoTexto')?.touched) {
           <span class="error-msg">Seleccione un proceso.</span>
         }
       </div>

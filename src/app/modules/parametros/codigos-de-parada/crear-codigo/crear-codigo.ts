@@ -4,10 +4,11 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfiguracionPaginacion } from '../../../../config/configuracion.paginacion';
 import { CodigoDeParadaModel } from '../../../../models/codigoDeParada.model';
 import { CodigoDeParadaService } from '../../../../services/parametros/codigo-de-parada.service';
+import { ConfirmModalComponent } from '../../../../shared/components/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-crear-codigo',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ConfirmModalComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './crear-codigo.html',
   styleUrl: './crear-codigo.css',
@@ -21,6 +22,9 @@ export class CrearCodigo implements OnInit {
   readonly paginaActual = signal(1);
   readonly codigoSeleccionado = signal<CodigoDeParadaModel | null>(null);
   readonly filtroBusqueda = signal('');
+
+  readonly mostrarConfirmacionEliminar = signal(false);
+  readonly codigoAEliminar = signal<CodigoDeParadaModel | null>(null);
 
   readonly codigoForm = this.fb.group({
     codigo: ['', [Validators.required]],
@@ -128,21 +132,32 @@ export class CrearCodigo implements OnInit {
 
   eliminarCodigo(codigo: CodigoDeParadaModel): void {
     if (!codigo.id) return;
+    this.codigoAEliminar.set(codigo);
+    this.mostrarConfirmacionEliminar.set(true);
+  }
 
-    if (confirm('¿Está seguro de eliminar este código de parada?')) {
-      this.codigoDeParadaService.EliminarCodigoDeParada(String(codigo.id)).subscribe({
-        next: () => {
-          if (this.codigoSeleccionado()?.id === codigo.id) {
-            this.cancelar();
-          }
-          this.cargarCodigos();
-        },
-        error: (err) => {
-          console.error('Error al eliminar el código de parada:', err);
-          alert('No se pudo eliminar el código de parada.');
-        },
-      });
-    }
+  cancelarEliminacion(): void {
+    this.codigoAEliminar.set(null);
+    this.mostrarConfirmacionEliminar.set(false);
+  }
+
+  confirmarEliminacion(): void {
+    const codigo = this.codigoAEliminar();
+    if (!codigo?.id) return;
+
+    this.codigoDeParadaService.EliminarCodigoDeParada(String(codigo.id)).subscribe({
+      next: () => {
+        if (this.codigoSeleccionado()?.id === codigo.id) {
+          this.cancelar();
+        }
+        this.cancelarEliminacion();
+        this.cargarCodigos();
+      },
+      error: (err) => {
+        console.error('Error al eliminar el código de parada:', err);
+        this.cancelarEliminacion();
+      },
+    });
   }
 
   cambiarPagina(pagina: number): void {

@@ -9,11 +9,12 @@ import { ProductoModel } from '../../../../models/producto.model';
 import { ProductoXProcesoModel } from '../../../../models/productoXProceso.model';
 import { ListarProcesoPorProducto } from '../listar-proceso-por-producto/listar-proceso-por-producto';
 import { forkJoin, Observable, Subscription } from 'rxjs';
+import { ConfirmModalComponent } from '../../../../shared/components/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-crear-producto',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Paginador, ListarProcesoPorProducto],
+  imports: [CommonModule, ReactiveFormsModule, Paginador, ListarProcesoPorProducto, ConfirmModalComponent],
   templateUrl: './crear-producto.html',
   styleUrl: './crear-producto.css',
 })
@@ -31,6 +32,9 @@ export class CrearProducto implements OnInit, OnDestroy {
   procesosAEliminar: number[] = [];
   hayCambiosSinGuardar: boolean = false;
   private formSub?: Subscription;
+
+  mostrarConfirmacionEliminar: boolean = false;
+  productoAEliminar: ProductoModel | null = null;
 
   get productosPaginados(): ProductoModel[] {
     const inicio = (this.paginaActual - 1) * this.registrosPorPagina;
@@ -246,22 +250,33 @@ export class CrearProducto implements OnInit, OnDestroy {
 
   eliminarProducto(producto: ProductoModel): void {
     if (!producto.id) return;
+    this.productoAEliminar = producto;
+    this.mostrarConfirmacionEliminar = true;
+  }
 
-    if (confirm('¿Está seguro de eliminar este producto?')) {
-      this.productoService.EliminarProducto(String(producto.id)).subscribe({
-        next: () => {
-          if (this.productoActual?.id === producto.id) {
-            this.cancelar();
-          }
-          this.cargarProductos();
-          this.cargarRelacionesProductoProceso();
-        },
-        error: (err: unknown) => {
-          console.error('Error al eliminar producto:', err);
-          alert('No se pudo eliminar el producto.');
-        },
-      });
-    }
+  cancelarEliminacion(): void {
+    this.productoAEliminar = null;
+    this.mostrarConfirmacionEliminar = false;
+  }
+
+  confirmarEliminacion(): void {
+    const producto = this.productoAEliminar;
+    if (!producto?.id) return;
+
+    this.productoService.EliminarProducto(String(producto.id)).subscribe({
+      next: () => {
+        if (this.productoActual?.id === producto.id) {
+          this.cancelar();
+        }
+        this.cancelarEliminacion();
+        this.cargarProductos();
+        this.cargarRelacionesProductoProceso();
+      },
+      error: (err: unknown) => {
+        console.error('Error al eliminar producto:', err);
+        this.cancelarEliminacion();
+      },
+    });
   }
 
 }

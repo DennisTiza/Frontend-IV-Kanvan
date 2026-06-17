@@ -33,41 +33,78 @@
 					<div class="proceso-block">
 						<div class="proceso-row" [formGroupName]="i">
 
+							<!-- Nombre del proceso -->
 							<div class="proceso-info">
 								<label>Proceso</label>
 								<span>{{ obtenerNombreProceso(procesos()[i]) }}</span>
 							</div>
 
+							<!-- Tiempo -->
 							<div>
 								<label [for]="'tiempo-' + i">Tiempo (Min)</label>
 								<input [id]="'tiempo-' + i" type="number" min="1" placeholder="45"
 									formControlName="tiempo" />
 							</div>
 
-							<div>
-								<label>Responsables</label>
-								<div class="operarios-lista" [id]="'operarios-' + i">
-									@for (operario of operarios(); track operario.id) {
-									<button type="button" class="operario-item"
-										[class.operario-seleccionado]="estaSeleccionado(procesoControl, operario.id)"
-										(click)="toggleOperario(procesoControl, operario.id)">
-										<span class="operario-check">
-											@if (estaSeleccionado(procesoControl, operario.id)) { ✓ }
-										</span>
-										{{ obtenerNombreOperario(operario) }}
-									</button>
+							<!-- Selección de responsables -->
+							<div class="operarios-field">
+								<label [for]="'buscar-operario-' + i">Responsables</label>
+
+								<!-- Chips de seleccionados -->
+								<div class="operarios-chips-wrap">
+									@for (op of operariosSeleccionados(procesoControl); track op.id) {
+									<span class="operario-chip">
+										{{ obtenerNombreOperario(op) }}
+										<button type="button" class="chip-remove"
+											(click)="toggleOperario(procesoControl, op.id, i)"
+											aria-label="Quitar operario">✕</button>
+									</span>
 									}
-									@if (operarios().length === 0) {
-									<span class="operarios-vacio">Sin operarios disponibles</span>
+									@if (operariosSeleccionados(procesoControl).length === 0) {
+									<span class="chips-placeholder">Ninguno seleccionado</span>
 									}
 								</div>
-							</div>
 
-						</div>
+								<!-- Input buscador + dropdown -->
+								<div class="operarios-search-wrap">
+									<input
+										type="text"
+										class="operarios-search-input"
+										[id]="'buscar-operario-' + i"
+										placeholder="Buscar por nombre o apellido…"
+										[value]="busquedaOperarios()[i] || ''"
+										(input)="setBusqueda(i, $any($event.target).value)"
+										(focus)="abrirDropdown(i)"
+										(blur)="cerrarDropdown(i)"
+										autocomplete="off" />
 
-						@if (i < controlesProcesos.length - 1) { <hr>
-							}
-					</div>
+									@if (esDropdownAbierto(i)) {
+									<div class="operarios-dropdown"
+									[id]="'dropdown-operarios-' + i"
+									[class.dropdown-arriba]="esDropdownArriba(i)">
+										@if (operariosFiltrados(i).length > 0) {
+											@for (operario of operariosFiltrados(i); track operario.id) {
+											<button type="button" class="operario-option"
+												[class.operario-option-seleccionada]="estaSeleccionado(procesoControl, operario.id)"
+												(mousedown)="toggleOperario(procesoControl, operario.id, i)">
+												<span class="operario-check-icon">
+													@if (estaSeleccionado(procesoControl, operario.id)) { ✓ }
+												</span>
+												{{ obtenerNombreOperario(operario) }}
+											</button>
+											}
+										} @else {
+										<span class="operarios-no-resultado">Sin resultados para "{{ busquedaOperarios()[i] }}"</span>
+										}
+									</div>
+									}
+								</div>
+							</div><!-- /operarios-field -->
+
+						</div><!-- /proceso-row -->
+
+						@if (i < controlesProcesos.length - 1) { <hr> }
+					</div><!-- /proceso-block -->
 					}
 				</div>
 				} @else {

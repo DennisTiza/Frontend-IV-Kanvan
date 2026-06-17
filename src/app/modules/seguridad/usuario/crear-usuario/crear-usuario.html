@@ -169,3 +169,12 @@
     (modalCerrado)="onModalCerrado()"
     (usuarioActualizado)="onUsuarioActualizado()">
 </app-editar-usuario>
+
+@if (mostrarConfirmacionEliminar) {
+<app-confirm-modal
+    titulo="Eliminar Usuario"
+    mensaje="¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer."
+    (confirmar)="confirmarEliminacion()"
+    (cancelar)="cancelarEliminacion()">
+</app-confirm-modal>
+}

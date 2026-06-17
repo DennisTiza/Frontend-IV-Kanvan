@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, computed, effect, inject, input, output, signal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { OperarioModel } from '../../../../models/operario.model';
 import { ProcesoModel } from '../../../../models/proceso.model';
@@ -21,6 +21,7 @@ type ProcesoFormularioGroup = FormGroup<{
 })
 export class EditarProcesoProduccion {
   private readonly fb = inject(FormBuilder);
+  private readonly elRef = inject(ElementRef);
 
   readonly abierto = input(true);
   readonly tarjetaCodigo = input('');
@@ -35,13 +36,27 @@ export class EditarProcesoProduccion {
 
   readonly titulo = computed(() => 'Asignar Tiempos de Procesos');
 
+  /** Texto de búsqueda por proceso (índice → query) */
+  readonly busquedaOperarios = signal<Record<number, string>>({});
+
+  /** Controla si el dropdown de búsqueda está abierto (índice → boolean) */
+  readonly dropdownAbierto = signal<Record<number, boolean>>({});
+
+  /** Controla la dirección del dropdown: true = hacia arriba */
+  readonly dropdownArriba = signal<Record<number, boolean>>({});
+
   readonly modalForm = this.fb.group({
     procesos: this.fb.array<ProcesoFormularioGroup>([]),
   });
 
   constructor() {
+    // El effect rastrea ambas señales juntas; solo reconstruye cuando hay procesos.
     effect(() => {
-      this.reconstruirFormulario(this.procesos(), this.asignaciones());
+      const procesos = this.procesos();
+      const asignaciones = this.asignaciones();
+      if (procesos.length > 0) {
+        this.reconstruirFormulario(procesos, asignaciones);
+      }
     });
   }
 
@@ -103,7 +118,7 @@ export class EditarProcesoProduccion {
     return ids.includes(operarioId);
   }
 
-  toggleOperario(procesoControl: ProcesoFormularioGroup, operarioId: number | undefined): void {
+  toggleOperario(procesoControl: ProcesoFormularioGroup, operarioId: number | undefined, procesoIndex: number): void {
     if (operarioId === undefined) return;
     const control = procesoControl.controls.operariosIds;
     const ids: number[] = [...(control.value ?? [])];
@@ -117,24 +132,83 @@ export class EditarProcesoProduccion {
     control.markAsTouched();
   }
 
+  /** Devuelve los operarios filtrados por la búsqueda del proceso i */
+  operariosFiltrados(procesoIndex: number): OperarioModel[] {
+    const query = (this.busquedaOperarios()[procesoIndex] ?? '').toLowerCase().trim();
+    if (!query) return this.operarios();
+    return this.operarios().filter(op => {
+      const nombre = (op.nombre ?? '').toLowerCase();
+      const apellido = (op.apellido ?? '').toLowerCase();
+      return nombre.includes(query) || apellido.includes(query);
+    });
+  }
+
+  /** Devuelve los operarios ya seleccionados para el proceso i */
+  operariosSeleccionados(procesoControl: ProcesoFormularioGroup): OperarioModel[] {
+    const ids: number[] = procesoControl.controls.operariosIds.value ?? [];
+    return this.operarios().filter(op => op.id !== undefined && ids.includes(op.id));
+  }
+
+  setBusqueda(procesoIndex: number, query: string): void {
+    this.busquedaOperarios.update(prev => ({ ...prev, [procesoIndex]: query }));
+  }
+
+  abrirDropdown(procesoIndex: number): void {
+    // Detectar si hay espacio suficiente debajo del input; si no, abrir hacia arriba
+    const inputId = `buscar-operario-${procesoIndex}`;
+    const inputEl: HTMLElement | null = this.elRef.nativeElement.querySelector(`#${inputId}`);
+    let abrirArriba = false;
+    if (inputEl) {
+      const rect = inputEl.getBoundingClientRect();
+      const espacioAbajo = window.innerHeight - rect.bottom;
+      abrirArriba = espacioAbajo < 220; // 220px ≈ alto máximo del dropdown
+    }
+    this.dropdownArriba.update(prev => ({ ...prev, [procesoIndex]: abrirArriba }));
+    this.dropdownAbierto.update(prev => ({ ...prev, [procesoIndex]: true }));
+  }
+
+  cerrarDropdown(procesoIndex: number): void {
+    // Pequeño delay para permitir que el click en la opción se registre primero
+    setTimeout(() => {
+      this.dropdownAbierto.update(prev => ({ ...prev, [procesoIndex]: false }));
+    }, 150);
+  }
+
+  esDropdownAbierto(procesoIndex: number): boolean {
+    return this.dropdownAbierto()[procesoIndex] ?? false;
+  }
+
+  esDropdownArriba(procesoIndex: number): boolean {
+    return this.dropdownArriba()[procesoIndex] ?? false;
+  }
+
   private reconstruirFormulario(procesos: ProcesoModel[], asignaciones: ProcesoXTarjetaModel[]): void {
     const procesosFormArray = this.modalForm.controls.procesos;
     procesosFormArray.clear();
+    // Resetear estados de búsqueda
+    this.busquedaOperarios.set({});
+    this.dropdownAbierto.set({});
+    this.dropdownArriba.set({});
 
-    procesos.forEach((proceso, index) => {
-      procesosFormArray.push(this.crearProcesoFormulario(proceso, asignaciones[index]));
+    procesos.forEach((proceso) => {
+      // Buscar la asignación por procesoId para evitar errores de mapeo por índice
+      const asignacion = asignaciones.find(a => a.procesoId === proceso.id);
+      procesosFormArray.push(this.crearProcesoFormulario(proceso, asignacion));
     });
   }
 
   private crearProcesoFormulario(proceso: ProcesoModel, asignacion?: ProcesoXTarjetaModel): ProcesoFormularioGroup {
-
+    // Extraer ids de operarios asignados desde cualquier estructura que devuelva el backend
     let operariosAsignados: number[] = [];
-    if (asignacion?.operariosIds) {
-      operariosAsignados = asignacion.operariosIds;
-    } else if (asignacion?.operarioXProcesoXTarjetas) {
-      operariosAsignados = asignacion.operarioXProcesoXTarjetas
+
+    if (Array.isArray(asignacion?.operariosIds) && asignacion!.operariosIds!.length > 0) {
+      // El backend devolvió los ids directamente
+      operariosAsignados = asignacion!.operariosIds!;
+    } else if (Array.isArray(asignacion?.operarioXProcesoXTarjetas) && asignacion!.operarioXProcesoXTarjetas!.length > 0) {
+      // El backend devolvió la relación anidada
+      operariosAsignados = asignacion!.operarioXProcesoXTarjetas!
         .map(o => o.operarioId)
-        .filter((id): id is number => id !== undefined);
+        .filter((id): id is number => id !== undefined && id !== null);
     }
 
     return this.fb.group({
@@ -143,7 +217,4 @@ export class EditarProcesoProduccion {
       operariosIds: new FormControl<number[]>(operariosAsignados, { validators: [Validators.required] }),
     });
   }
-
-
-
 }

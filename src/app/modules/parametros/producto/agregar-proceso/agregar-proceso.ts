@@ -5,11 +5,12 @@ import { ProcesoService } from '../../../../services/parametros/proceso.service'
 import { ProductoXProcesoService } from '../../../../services/parametros/producto-xproceso.service';
 import { ProcesoModel } from '../../../../models/proceso.model';
 import { ProductoXProcesoModel } from '../../../../models/productoXProceso.model';
+import { BuscarSeleccionarDirective } from '../../../../directives/buscar-seleccionar.directive';
 
 @Component({
   selector: 'app-agregar-proceso',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, BuscarSeleccionarDirective],
   templateUrl: './agregar-proceso.html',
   styleUrl: './agregar-proceso.css',
 })
@@ -24,6 +25,10 @@ export class AgregarProceso implements OnInit {
   listaProcesos: ProcesoModel[] = [];
   cargando: boolean = false;
 
+  get opcionesProceso(): string[] {
+    return this.listaProcesos.map((p) => `${p.codigo ?? ''} - ${p.nombre ?? ''}`.trim());
+  }
+
   constructor(
     private fb: FormBuilder,
     private procesoService: ProcesoService,
@@ -31,8 +36,17 @@ export class AgregarProceso implements OnInit {
     private cdr: ChangeDetectorRef
   ) {
     this.procesoForm = this.fb.group({
-      idProceso: ['', Validators.required],
+      idProceso: [null as number | null, Validators.required],
+      procesoTexto: ['', Validators.required]
     });
+  }
+
+  onProcesoSeleccionado(texto: string): void {
+    const proceso = this.listaProcesos.find(
+      (p) => `${p.codigo ?? ''} - ${p.nombre ?? ''}`.trim() === texto
+    );
+    this.procesoForm.get('idProceso')?.setValue(proceso?.id ?? null);
+    this.procesoForm.get('idProceso')?.markAsTouched();
   }
 
   ngOnInit(): void {

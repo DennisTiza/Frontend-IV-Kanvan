@@ -4,10 +4,11 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfiguracionPaginacion } from '../../../../config/configuracion.paginacion';
 import { ProcesoModel } from '../../../../models/proceso.model';
 import { ProcesoService } from '../../../../services/parametros/proceso.service';
+import { ConfirmModalComponent } from '../../../../shared/components/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-crear-proceso',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ConfirmModalComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './crear-proceso.html',
   styleUrl: './crear-proceso.css',
@@ -21,6 +22,9 @@ export class CrearProceso implements OnInit {
   readonly paginaActual = signal(1);
   readonly procesoSeleccionado = signal<ProcesoModel | null>(null);
   readonly filtroBusqueda = signal('');
+
+  readonly mostrarConfirmacionEliminar = signal(false);
+  readonly procesoAEliminar = signal<ProcesoModel | null>(null);
 
   readonly procesoForm = this.fb.group({
     codigo: ['', [Validators.required]],
@@ -126,21 +130,32 @@ export class CrearProceso implements OnInit {
 
   eliminarProceso(proceso: ProcesoModel): void {
     if (!proceso.id) return;
+    this.procesoAEliminar.set(proceso);
+    this.mostrarConfirmacionEliminar.set(true);
+  }
 
-    if (confirm('¿Está seguro de eliminar este proceso?')) {
-      this.procesoService.EliminarProceso(String(proceso.id)).subscribe({
-        next: () => {
-          if (this.procesoSeleccionado()?.id === proceso.id) {
-            this.cancelar();
-          }
-          this.cargarProcesos();
-        },
-        error: (err) => {
-          console.error('Error al eliminar el proceso:', err);
-          alert('No se pudo eliminar el proceso.');
-        },
-      });
-    }
+  cancelarEliminacion(): void {
+    this.procesoAEliminar.set(null);
+    this.mostrarConfirmacionEliminar.set(false);
+  }
+
+  confirmarEliminacion(): void {
+    const proceso = this.procesoAEliminar();
+    if (!proceso?.id) return;
+
+    this.procesoService.EliminarProceso(String(proceso.id)).subscribe({
+      next: () => {
+        if (this.procesoSeleccionado()?.id === proceso.id) {
+          this.cancelar();
+        }
+        this.cancelarEliminacion();
+        this.cargarProcesos();
+      },
+      error: (err) => {
+        console.error('Error al eliminar el proceso:', err);
+        this.cancelarEliminacion();
+      },
+    });
   }
 
   cambiarPagina(pagina: number): void {
