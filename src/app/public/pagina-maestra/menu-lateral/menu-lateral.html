@@ -10,15 +10,15 @@
 		@for (menu of listaMenus(); track menu.ruta) {
 		<a class="menu-item" [routerLink]="menu.ruta" routerLinkActive="active"
 			[routerLinkActiveOptions]="{ exact: true }" (click)="seleccionarMenu()">
-			<span class="icon" aria-hidden="true">{{ obtenerIcono(menu.titulo) }}</span>
-			<span>{{ menu.titulo}}</span>
+			<span class="icon" aria-hidden="true" [innerHTML]="sanitizarIcono(menu.icono)"></span>
+			<span>{{ menu.titulo }}</span>
 		</a>
 		}
 	</nav>
 
 	<div class="sidebar-footer">
 		<button class="menu-item menu-action logout" type="button" (click)="cerrarSesion()">
-			<span class="icon" aria-hidden="true">←</span>
+			<span class="icon" aria-hidden="true" [innerHTML]="iconoLogout"></span>
 			<span>Cerrar Sesión</span>
 		</button>
 	</div>

@@ -166,6 +166,7 @@
     background: #f8fafc;
     outline: none;
     transition: 0.3s;
+    box-sizing: border-box;
 }
 
 .field input:focus {

@@ -3,4 +3,6 @@ export class ItemMenuModel {
     titulo?: string;
     ruta?: string;
     accion?: string;
+    /** SVG inline como string — viene del ConfiguracionMenu */
+    icono?: string;
 }

@@ -83,7 +83,7 @@
         </div>
 
         <button type="submit" class="submit-button" [disabled]="fGroup.invalid">
-          Iniciar Sesión →
+          Iniciar Sesión
         </button>
 
         <div class="footer">
@@ -95,36 +95,38 @@
 
   <!-- Modal de error elegante -->
   @if (mostrarModalError()) {
-    <div class="modal-overlay" (click)="cerrarModalError()">
-      <div class="modal-card" (click)="$event.stopPropagation()">
-        <button type="button" class="modal-close-btn" (click)="cerrarModalError()" aria-label="Cerrar modal">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
+  <div class="modal-overlay" (click)="cerrarModalError()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <button type="button" class="modal-close-btn" (click)="cerrarModalError()" aria-label="Cerrar modal">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="modal-icon-container">
+        <div class="modal-icon-bg">
+          <svg class="error-svg" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
           </svg>
-        </button>
-        
-        <div class="modal-icon-container">
-          <div class="modal-icon-bg">
-            <svg class="error-svg" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-              <line x1="12" y1="9" x2="12" y2="13"></line>
-              <line x1="12" y1="17" x2="12.01" y2="17"></line>
-            </svg>
-          </div>
-        </div>
-
-        <div class="modal-content">
-          <h3>Acceso Denegado</h3>
-          <p>{{ mensajeError() }}</p>
-        </div>
-
-        <div class="modal-actions">
-          <button type="button" class="modal-btn-confirm" (click)="cerrarModalError()">
-            Intentar de nuevo
-          </button>
         </div>
       </div>
+
+      <div class="modal-content">
+        <h3>Acceso Denegado</h3>
+        <p>{{ mensajeError() }}</p>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="modal-btn-confirm" (click)="cerrarModalError()">
+          Intentar de nuevo
+        </button>
+      </div>
     </div>
+  </div>
   }
 </section>
