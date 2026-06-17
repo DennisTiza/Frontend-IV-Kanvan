@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { ConfiguracionRutasBackend } from '../../config/configuracion.rutas.backend';
 import { HttpClient } from '@angular/common/http';
 import { ProcesoXTarjetaModel } from '../../models/procesoXTarjeta.model';
+import { ParadaModel } from '../../models/parada.model';
+import { RegistroDeCantidadModel } from '../../models/registro-de-cantidad.model';
 import { catchError, Observable, throwError } from 'rxjs';
 
 @Injectable({
@@ -46,7 +48,19 @@ export class ProcesoXtarjetaService {
     return this.http.post<any>(`${this.urlBase}proceso-x-tarjeta/${id}/iniciar`, {});
   }
 
-  FinalizarProceso(id: number): Observable<any> {
-    return this.http.post<any>(`${this.urlBase}proceso-x-tarjeta/${id}/finalizar`, {});
+  FinalizarProceso(id: number, body?: { cantidadReportada?: number; operarioId?: number }): Observable<any> {
+    return this.http.post<any>(`${this.urlBase}proceso-x-tarjeta/${id}/finalizar`, body ?? {});
+  }
+
+  RegistrarParada(id: number, body: { cantidadReportada: number; codigoDeParadaId: number; operarioId: number }): Observable<any> {
+    return this.http.post<any>(`${this.urlBase}proceso-x-tarjeta/${id}/registrar-parada`, body);
+  }
+
+  ObtenerParadas(id: number): Observable<ParadaModel[]> {
+    return this.http.get<ParadaModel[]>(`${this.urlBase}proceso-x-tarjeta/${id}/paradas`);
+  }
+
+  ObtenerRegistrosCantidad(id: number): Observable<RegistroDeCantidadModel[]> {
+    return this.http.get<RegistroDeCantidadModel[]>(`${this.urlBase}proceso-x-tarjeta/${id}/registros-cantidad`);
   }
 }

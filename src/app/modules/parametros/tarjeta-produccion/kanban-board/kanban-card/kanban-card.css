@@ -282,3 +282,70 @@
   height: 14px;
   color: #9ca3af;
 }
+
+.proceso-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.proceso-bar-nombre {
+  font-weight: 600;
+  color: #374151;
+  min-width: 60px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.proceso-bar-barra-container {
+  flex: 1;
+  height: 6px;
+  background: #f1f4f6;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.proceso-bar-fill {
+  height: 100%;
+  background: #2563eb;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.proceso-bar-texto {
+  font-weight: 600;
+  color: #6b7280;
+  min-width: 40px;
+  text-align: right;
+  font-size: 11px;
+}
+
+.proceso-bar-indicador {
+  font-size: 12px;
+  line-height: 1;
+}
+
+.timer-card-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.timer-label {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.disponible-row {
+  margin-top: 2px;
+}
+
+.disponible-texto {
+  font-size: 12px;
+  font-weight: 600;
+  color: #2563eb;
+}

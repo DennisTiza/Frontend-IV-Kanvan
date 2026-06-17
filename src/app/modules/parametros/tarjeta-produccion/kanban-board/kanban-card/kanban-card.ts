@@ -21,11 +21,12 @@ export class KanbanCardComponent implements OnInit, OnDestroy {
 
   readonly tiempoRestante = signal('--:--:--');
   readonly progreso = signal(0);
+  readonly nombreTimerProceso = signal('');
 
   ngOnInit(): void {
-    const proceso = this.obtenerProcesoActivo();
+    const proceso = this.obtenerProcesoTimer();
     if (proceso) {
-      console.log(`[Timer] Iniciado | procesoId: ${proceso.id}, tarjetaId: ${this.tarjeta.id}, codigo: ${this.tarjeta.codigo}`);
+      this.nombreTimerProceso.set(proceso.proceso?.nombre ?? '');
       this.iniciarTemporizador();
     }
   }
@@ -47,54 +48,39 @@ export class KanbanCardComponent implements OnInit, OnDestroy {
   }
 
   private actualizarTiempo(): void {
-    const procesoActivo = this.obtenerProcesoActivo();
+    const procesoActivo = this.obtenerProcesoTimer();
     if (!procesoActivo?.fechaInicio || !procesoActivo?.tiempo) {
-      console.log('[Timer] Retorno temprano', {
-        existeProceso: !!procesoActivo,
-        fechaInicio: procesoActivo?.fechaInicio,
-        tiempo: procesoActivo?.tiempo,
-        tarjetaId: this.tarjeta.id,
-      });
       return;
     }
 
     const inicio = new Date(procesoActivo.fechaInicio).getTime();
     const ahora = Date.now();
-    const estimadoMs = procesoActivo.tiempo * 60 * 1000;
-    const transcurrido = ahora - inicio;
-    const restante = Math.max(0, estimadoMs - transcurrido);
-    const progreso = Math.min(100, Math.round((restante / estimadoMs) * 100));
+    const sesion = (ahora - inicio) / 1000;
+    const consumidoTotal = (procesoActivo.tiempoConsumido ?? 0) + sesion;
+    const restanteSeg = Math.max(0, (procesoActivo.tiempo * 60) - consumidoTotal);
+    const restanteMs = restanteSeg * 1000;
+    const pct = Math.min(100, Math.round((consumidoTotal / (procesoActivo.tiempo * 60)) * 100));
 
-    console.log('[Timer] actualizarTiempo', {
-      tarjetaId: this.tarjeta.id,
-      procesoId: procesoActivo.id,
-      tiempo: procesoActivo.tiempo,
-      fechaInicio: procesoActivo.fechaInicio,
-      inicio,
-      ahora,
-      estimadoMs,
-      transcurrido,
-      restante,
-      progreso,
-    });
-
-    const horas = Math.floor(restante / 3600000);
-    const minutos = Math.floor((restante % 3600000) / 60000);
-    const segundos = Math.floor((restante % 60000) / 1000);
+    const horas = Math.floor(restanteMs / 3600000);
+    const minutos = Math.floor((restanteMs % 3600000) / 60000);
+    const segundos = Math.floor((restanteMs % 60000) / 1000);
 
     this.tiempoRestante.set(
       `${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`
     );
-    this.progreso.set(progreso);
+    this.progreso.set(pct);
   }
 
-  getTiempoEstimadoLabel(): string {
-    const procesoActivo = this.obtenerProcesoActivo();
-    if (!procesoActivo?.tiempo) return '--:--:--';
-    const totalMin = procesoActivo.tiempo;
-    const h = Math.floor(totalMin / 60);
-    const m = totalMin % 60;
-    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`;
+  obtenerProcesoTimer(): ProcesoXTarjetaModel | undefined {
+    const activos = this.tarjeta.procesoXTarjetas?.filter((p) => p.fechaInicio && !p.fechaFinal) ?? [];
+    if (activos.length === 0) return undefined;
+    return activos.reduce((ultimo, p) =>
+      !ultimo || (p.fechaInicio! > ultimo.fechaInicio!) ? p : ultimo
+    );
+  }
+
+  obtenerProcesosConAvance(): ProcesoXTarjetaModel[] {
+    return this.tarjeta.procesoXTarjetas ?? [];
   }
 
   getEstadoBadgeClass(): string {
@@ -113,23 +99,8 @@ export class KanbanCardComponent implements OnInit, OnDestroy {
     return estado ?? '';
   }
 
-  obtenerProximoProceso(): ProcesoXTarjetaModel | undefined {
-    if (this.obtenerProcesoActivo()) return undefined;
-    return this.tarjeta.procesoXTarjetas?.find((p) => !p.fechaInicio);
-  }
-
-  obtenerProcesoActivo(): ProcesoXTarjetaModel | undefined {
-    return this.tarjeta.procesoXTarjetas?.find((p) => p.fechaInicio && !p.fechaFinal);
-  }
-
-  obtenerTiempoTotal(): number {
-    return this.tarjeta.procesoXTarjetas?.reduce((sum, p) => sum + (p.tiempo ?? 0), 0) ?? 0;
-  }
-
-  obtenerNombreOperario(): string {
-    const proximo = this.obtenerProximoProceso();
-    const activo = this.obtenerProcesoActivo();
-    const target = proximo ?? activo;
+  obtenerNombreOperario(proceso?: ProcesoXTarjetaModel): string {
+    const target = proceso;
     if (target?.operarioXProcesoXTarjetas && target.operarioXProcesoXTarjetas.length > 0) {
       return target.operarioXProcesoXTarjetas
         .map(rel => rel.operario ? `${rel.operario.nombre ?? ''} ${rel.operario.apellido ?? ''}`.trim() : '')
@@ -137,14 +108,6 @@ export class KanbanCardComponent implements OnInit, OnDestroy {
         .join(', ') || 'Sin asignar';
     }
     return 'Sin asignar';
-  }
-
-  obtenerProcesoActual(): string {
-    const activo = this.obtenerProcesoActivo();
-    if (activo?.proceso) return activo.proceso.nombre ?? 'Sin proceso';
-    const proximo = this.obtenerProximoProceso();
-    if (proximo?.proceso) return proximo.proceso.nombre ?? 'Sin proceso';
-    return 'Sin proceso';
   }
 
   verDetalles(): void {
@@ -168,27 +131,11 @@ export class KanbanCardComponent implements OnInit, OnDestroy {
     return 'timer-normal';
   }
 
-  getProgresoBarClass(): string {
-    const p = this.progreso();
-    if (p > 80) return 'progreso-verde';
-    if (p > 50) return 'progreso-naranja';
-    return 'progreso-rojo';
-  }
-
-  obtenerProcesoActivoNumero(): number {
-    const activo = this.obtenerProcesoActivo();
-    if (!activo || !this.tarjeta.procesoXTarjetas) return 0;
-    return this.tarjeta.procesoXTarjetas.indexOf(activo) + 1;
-  }
-
   obtenerFechaCierreUltimoProceso(): string | undefined {
     const procesos = this.tarjeta.procesoXTarjetas;
     if (!procesos || procesos.length === 0) return undefined;
-
     const procesosConFecha = procesos.filter((p) => p.fechaFinal);
     if (procesosConFecha.length === 0) return undefined;
-
-    // Ordenar por el campo 'orden' ascendente y tomar el último
     const sorted = [...procesosConFecha].sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
     return sorted[sorted.length - 1].fechaFinal;
   }
@@ -202,8 +149,30 @@ export class KanbanCardComponent implements OnInit, OnDestroy {
     return '--/--/---- --:--';
   }
 
+  getTiempoConsumidoDisplay(p: ProcesoXTarjetaModel): string {
+    const sesion = p.fechaInicio && !p.fechaFinal
+      ? (Date.now() - new Date(p.fechaInicio).getTime()) / 1000
+      : 0;
+    const totalSeg = (p.tiempoConsumido ?? 0) + sesion;
+    if (totalSeg <= 0) return '';
+    const m = Math.floor(totalSeg / 60);
+    const s = Math.floor(totalSeg % 60);
+    return m > 0 ? `${m}m ${s}s` : `${s}s`;
+  }
+
+  getBarraPorcentaje(p: ProcesoXTarjetaModel): number {
+    const total = p.cantidad ?? 1;
+    const registrada = p.cantidadRegistrada ?? 0;
+    if (total <= 0) return 0;
+    return Math.min(100, Math.round((registrada / total) * 100));
+  }
+
+  estaCompleta(): boolean {
+    return this.tarjeta.procesoXTarjetas?.every((p) => (p.cantidadRegistrada ?? 0) >= (p.cantidad ?? 0)) ?? false;
+  }
+
   onClick(): void {
-    if (!this.obtenerProcesoActivo() && !this.obtenerProximoProceso() && this.tarjeta.estado === 'finalizada') {
+    if (this.estaCompleta()) {
       this.verResumen();
       return;
     }

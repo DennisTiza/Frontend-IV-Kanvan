@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { Observable } from 'rxjs';
 import { TarjetaProduccionModel } from '../../../../models/tarjeta-produccion.model';
 import { TarjetaProduccionService } from '../../../../services/parametros/tarjeta-produccion.service';
 import { ProcesoXtarjetaService } from '../../../../services/parametros/proceso-xtarjeta.service';
@@ -31,9 +32,11 @@ export class KanbanBoardComponent implements OnInit {
       next: (data) => {
         const tieneActivo = (t: TarjetaProduccionModel) =>
           t.procesoXTarjetas?.some((p) => p.fechaInicio && !p.fechaFinal);
-        this.enEjecucion.set(data.filter((t) => tieneActivo(t)));
-        this.finalizadas.set(data.filter((t) => t.estado === 'finalizada' && !tieneActivo(t)));
-        this.porHacer.set(data.filter((t) => !tieneActivo(t) && t.estado !== 'finalizada'));
+        const estaCompleta = (t: TarjetaProduccionModel) =>
+          t.procesoXTarjetas?.every((p) => (p.cantidadRegistrada ?? 0) >= (p.cantidad ?? 0));
+        this.enEjecucion.set(data.filter((t) => tieneActivo(t) && !estaCompleta(t)));
+        this.finalizadas.set(data.filter((t) => estaCompleta(t)));
+        this.porHacer.set(data.filter((t) => !tieneActivo(t) && !estaCompleta(t)));
       },
       error: (err) => console.error('Error al cargar tarjetas Kanban:', err),
     });
@@ -47,10 +50,34 @@ export class KanbanBoardComponent implements OnInit {
     this.tarjetaSeleccionada.set(null);
   }
 
-  manejarAccionProceso(evento: { tipo: 'iniciar' | 'finalizar'; procesoId: number }): void {
-    const accion = evento.tipo === 'iniciar'
-      ? this.procesoXTarjetaService.IniciarProceso(evento.procesoId)
-      : this.procesoXTarjetaService.FinalizarProceso(evento.procesoId);
+  manejarAccionProceso(evento: {
+    tipo: 'iniciar' | 'finalizar' | 'registrar-parada';
+    procesoId: number;
+    cantidadReportada?: number;
+    codigoDeParadaId?: number;
+    operarioId?: number;
+  }): void {
+    let accion: Observable<any>;
+
+    switch (evento.tipo) {
+      case 'iniciar':
+        accion = this.procesoXTarjetaService.IniciarProceso(evento.procesoId);
+        break;
+      case 'finalizar':
+        accion = this.procesoXTarjetaService.FinalizarProceso(
+          evento.procesoId,
+          evento.cantidadReportada !== undefined ? { cantidadReportada: evento.cantidadReportada, operarioId: evento.operarioId } : undefined
+        );
+        break;
+      case 'registrar-parada':
+        accion = this.procesoXTarjetaService.RegistrarParada(
+          evento.procesoId,
+          { cantidadReportada: evento.cantidadReportada!, codigoDeParadaId: evento.codigoDeParadaId!, operarioId: evento.operarioId! }
+        );
+        break;
+      default:
+        return;
+    }
 
     accion.subscribe({
       next: () => {

@@ -1,4 +1,4 @@
-<div class="kanban-card" (click)="onClick()" [class.card-clickable]="tarjeta.estado !== 'finalizada'">
+<div class="kanban-card" (click)="onClick()" [class.card-clickable]="!estaCompleta()">
   <div class="card-header">
     <div class="card-header-left">
       <span class="card-codigo">{{ tarjeta.codigo }}</span>
@@ -10,61 +10,45 @@
   <div class="card-body">
     <div class="card-info">
       <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-      <span class="info-text">Cantidad: <strong>{{ tarjeta.cantidad ?? '-' }} unidades</strong></span>
+      <span class="info-text">{{ tarjeta.cantidad ?? '-' }} unidades</span>
     </div>
 
-    @if (obtenerProcesoActivo()) {
-      <div class="card-info">
-        <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <span class="info-text"><strong>{{ obtenerNombreOperario() }}</strong></span>
-      </div>
+    @for (proceso of obtenerProcesosConAvance(); track proceso.id) {
+      @let pct = getBarraPorcentaje(proceso);
+      @let activo = !!proceso.fechaInicio && !proceso.fechaFinal;
+      @let tieneParadas = (proceso.cantidadRegistrada ?? 0) > 0 && !proceso.fechaFinal;
 
-      <div class="proceso-seccion">
-        <div class="proceso-info-header">
-          <div class="proceso-info-left">
-            <span class="proceso-nombre-label">{{ obtenerProcesoActual() }}</span>
-            <span class="proceso-numero-label">#{{ obtenerProcesoActivoNumero() }}</span>
-          </div>
-          <div class="timer-display {{ getTimerColor() }}">
-            <svg class="info-icon timer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            <span class="timer-value">{{ tiempoRestante() }}</span>
-          </div>
+      <div class="proceso-bar-row">
+        <span class="proceso-bar-nombre">{{ proceso.proceso?.nombre ?? 'Sin nombre' }}</span>
+        <div class="proceso-bar-barra-container">
+          <div class="proceso-bar-fill" [style.width.%]="pct"></div>
         </div>
+        <span class="proceso-bar-texto">{{ proceso.cantidadRegistrada ?? 0 }}/{{ proceso.cantidad ?? 0 }}</span>
+        @if (tieneParadas) {
+          <span class="proceso-bar-indicador" title="Tiene paradas registradas">⚠️</span>
+        }
+        @if (activo) {
+          <span class="proceso-bar-indicador" title="En ejecución">▶</span>
+        }
+      </div>
+    }
 
-        <div class="progress-container">
-          <div class="progress-bar">
-            <div class="progress-fill {{ getProgresoBarClass() }}" [style.width.%]="progreso()"></div>
-          </div>
+    @let timerProceso = obtenerProcesoTimer();
+    @if (timerProceso) {
+      <div class="timer-card-row">
+        <div class="timer-display {{ getTimerColor() }}">
+          <svg class="info-icon timer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span class="timer-value">{{ tiempoRestante() }}</span>
         </div>
+        <span class="timer-label">{{ timerProceso.proceso?.nombre ?? '' }}</span>
+        @let real = getTiempoConsumidoDisplay(timerProceso);
+        @if (real) {
+          <span class="timer-label" style="margin-left:8px;color:#6b7280">({{ real }})</span>
+        }
       </div>
+    }
 
-      <div class="card-action">
-        <button class="action-btn" (click)="onClick()">
-          Ver detalles
-          <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        </button>
-      </div>
-    } @else if (obtenerProximoProceso()) {
-      <div class="card-info">
-        <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span class="info-text">Tiempo total: <strong>{{ obtenerTiempoTotal() }} min</strong></span>
-      </div>
-      <div class="card-info">
-        <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        <span class="info-text">Próximo: <strong>{{ obtenerProcesoActual() }} ({{ obtenerProximoProceso()?.tiempo ?? '-' }} min)</strong></span>
-      </div>
-      <div class="card-info">
-        <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <span class="info-text">Operario: <strong>{{ obtenerNombreOperario() }}</strong></span>
-      </div>
-
-      <div class="card-action">
-        <button class="action-btn" (click)="onClick()">
-          Ver detalles
-          <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-        </button>
-      </div>
-    } @else {
+    @if (estaCompleta()) {
       <div class="completada-seccion">
         <div class="completada-indicator">
           <svg class="completada-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -75,13 +59,17 @@
           <span class="info-text">{{ formatCierre() }}</span>
         </div>
       </div>
-
-      <div class="card-action">
-        <button class="action-btn" (click)="verResumen()">
-          Ver resumen
-          <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        </button>
-      </div>
     }
+
+    <div class="card-action">
+      <button class="action-btn" (click)="onClick()">
+        @if (estaCompleta()) {
+          Ver resumen
+        } @else {
+          Ver detalles
+        }
+        <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
   </div>
 </div>

@@ -7,8 +7,12 @@ export class ProcesoXTarjetaModel {
     procesoId?: number;
     tarjetaDeProduccionId?: number;
     tiempo?: number;
+    tiempoConsumido?: number;
     fechaInicio?: string;
     fechaFinal?: string;
+    cantidad?: number;
+    cantidadRealizada?: number;
+    cantidadRegistrada?: number;
     proceso?: ProcesoModel;
     orden?: number;
     productoXProceso?: { orden?: number };
