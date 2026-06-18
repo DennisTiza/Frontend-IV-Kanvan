@@ -7,11 +7,12 @@ import { RolModel } from '../../../../models/rol.model';
 import { Paginador } from '../../../../public/componentes/paginador/paginador';
 import { ConfiguracionPaginacion } from '../../../../config/configuracion.paginacion';
 import { EditarUsuario } from '../editar-usuario/editar-usuario';
+import { ConfirmModalComponent } from '../../../../shared/components/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-crear-usuario',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Paginador, EditarUsuario],
+  imports: [CommonModule, ReactiveFormsModule, Paginador, EditarUsuario, ConfirmModalComponent],
   templateUrl: './crear-usuario.html',
   styleUrl: './crear-usuario.css',
 })
@@ -24,6 +25,9 @@ export class CrearUsuario implements OnInit {
 
   /** Usuario que se pasa al modal de edición (null = modal cerrado) */
   usuarioSeleccionado: UsuarioModel | null = null;
+
+  mostrarConfirmacionEliminar: boolean = false;
+  idUsuarioAEliminar: number | null = null;
 
   paginaActual: number = 1;
   registrosPorPagina: number = ConfiguracionPaginacion.registrosPorPagina;
@@ -165,16 +169,26 @@ export class CrearUsuario implements OnInit {
   }
 
   eliminarUsuario(id: number): void {
-    if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
-      this.seguridadService.EliminarUsuario(id).subscribe({
+    this.idUsuarioAEliminar = id;
+    this.mostrarConfirmacionEliminar = true;
+  }
+
+  cancelarEliminacion(): void {
+    this.idUsuarioAEliminar = null;
+    this.mostrarConfirmacionEliminar = false;
+  }
+
+  confirmarEliminacion(): void {
+    if (this.idUsuarioAEliminar !== null) {
+      this.seguridadService.EliminarUsuario(this.idUsuarioAEliminar).subscribe({
         next: () => {
-          alert('Usuario eliminado exitosamente');
+          this.cancelarEliminacion();
           this.cargarUsuarios(); // Recargar la lista
           this.cdr.detectChanges();
         },
         error: (err) => {
           console.error('Error al eliminar usuario', err);
-          alert('No se pudo eliminar el usuario');
+          this.cancelarEliminacion();
         }
       });
     }

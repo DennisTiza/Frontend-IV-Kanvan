@@ -198,4 +198,12 @@
 		</div>
 	</section>
 
+	@if (mostrarConfirmacionEliminar()) {
+	<app-confirm-modal
+		titulo="Eliminar Proceso"
+		mensaje="¿Estás seguro de que deseas eliminar este proceso? Esta acción no se puede deshacer."
+		(confirmar)="confirmarEliminacion()"
+		(cancelar)="cancelarEliminacion()">
+	</app-confirm-modal>
+	}
 </div>

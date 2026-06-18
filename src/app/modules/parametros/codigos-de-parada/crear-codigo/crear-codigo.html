@@ -161,4 +161,12 @@
 		</div>
 	</section>
 
+	@if (mostrarConfirmacionEliminar()) {
+	<app-confirm-modal
+		titulo="Eliminar Código de Parada"
+		mensaje="¿Estás seguro de que deseas eliminar este código de parada? Esta acción no se puede deshacer."
+		(confirmar)="confirmarEliminacion()"
+		(cancelar)="cancelarEliminacion()">
+	</app-confirm-modal>
+	}
 </div>

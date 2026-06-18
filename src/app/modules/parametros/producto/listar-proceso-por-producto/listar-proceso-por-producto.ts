@@ -88,20 +88,18 @@ export class ListarProcesoPorProducto implements OnInit {
   }
 
   eliminarProcesoXProducto(index: number): void {
-    if (confirm('¿Está seguro de eliminar este proceso del producto?')) {
-      const proceso = this.procesos[index];
-      if (proceso.id) {
-        this.procesoEliminado.emit(proceso.id);
-      }
-      const nuevosProcesos = [...this.procesos];
-      nuevosProcesos.splice(index, 1);
-      
-      nuevosProcesos.forEach((p, i) => {
-        p.orden = i + 1;
-      });
-      
-      this.procesosActualizados.emit(nuevosProcesos);
+    const proceso = this.procesos[index];
+    if (proceso.id) {
+      this.procesoEliminado.emit(proceso.id);
     }
+    const nuevosProcesos = [...this.procesos];
+    nuevosProcesos.splice(index, 1);
+    
+    nuevosProcesos.forEach((p, i) => {
+      p.orden = i + 1;
+    });
+    
+    this.procesosActualizados.emit(nuevosProcesos);
   }
 
   onDragStart(event: DragEvent, index: number): void {

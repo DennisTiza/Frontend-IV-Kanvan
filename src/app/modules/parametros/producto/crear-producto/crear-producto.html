@@ -195,4 +195,12 @@
     }
   </section>
 
+  @if (mostrarConfirmacionEliminar) {
+  <app-confirm-modal
+    titulo="Eliminar Producto"
+    mensaje="¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer."
+    (confirmar)="confirmarEliminacion()"
+    (cancelar)="cancelarEliminacion()">
+  </app-confirm-modal>
+  }
 </div>

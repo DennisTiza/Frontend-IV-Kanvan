@@ -15,14 +15,16 @@ import { ProductoXProcesoService } from '../../../../services/parametros/product
 import { ProcesoService } from '../../../../services/parametros/proceso.service';
 import { ProcesoXtarjetaService } from '../../../../services/parametros/proceso-xtarjeta.service';
 import { OperarioService } from '../../../../services/parametros/operario.service';
+import { OperarioXProcesoXTarjetaService } from '../../../../services/parametros/operario-xproceso-xtarjeta.service';
 import { TarjetaProduccionService } from '../../../../services/parametros/tarjeta-produccion.service';
 import { ConfiguracionPaginacion } from '../../../../config/configuracion.paginacion';
 import { Paginador } from '../../../../public/componentes/paginador/paginador';
+import { ConfirmModalComponent } from '../../../../shared/components/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-crear-tarjeta-produccion',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Paginador, EditarProcesoProduccion, ResumenAsignaciones, BuscarSeleccionarDirective],
+  imports: [CommonModule, ReactiveFormsModule, Paginador, EditarProcesoProduccion, ResumenAsignaciones, BuscarSeleccionarDirective, ConfirmModalComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './crear-tarjeta-produccion.html',
   styleUrl: './crear-tarjeta-produccion.css',
@@ -33,6 +35,7 @@ export class CrearTarjetaProduccion implements OnInit {
   private readonly productoXProcesoService = inject(ProductoXProcesoService);
   private readonly procesoService = inject(ProcesoService);
   private readonly operarioService = inject(OperarioService);
+  private readonly operarioXProcesoXTarjetaService = inject(OperarioXProcesoXTarjetaService);
   private readonly procesoXTarjetaService = inject(ProcesoXtarjetaService);
   private readonly tarjetaService = inject(TarjetaProduccionService);
 
@@ -49,6 +52,9 @@ export class CrearTarjetaProduccion implements OnInit {
   readonly guardando = signal(false);
   readonly filtroBusqueda = signal('');
   readonly esNuevaTarjeta = signal(false);
+
+  readonly mostrarConfirmacionEliminar = signal(false);
+  readonly tarjetaAEliminar = signal<TarjetaProduccionModel | null>(null);
 
   paginaActual: number = 1;
   registrosPorPagina: number = ConfiguracionPaginacion.registrosPorPagina;
@@ -236,20 +242,31 @@ export class CrearTarjetaProduccion implements OnInit {
     if (!tarjeta.id) {
       return;
     }
+    this.tarjetaAEliminar.set(tarjeta);
+    this.mostrarConfirmacionEliminar.set(true);
+  }
 
-    const confirmado = confirm(`¿Desea eliminar la tarjeta ${tarjeta.codigo ?? tarjeta.id}?`);
-    if (!confirmado) {
-      return;
-    }
+  cancelarEliminacion(): void {
+    this.tarjetaAEliminar.set(null);
+    this.mostrarConfirmacionEliminar.set(false);
+  }
+
+  confirmarEliminacion(): void {
+    const tarjeta = this.tarjetaAEliminar();
+    if (!tarjeta?.id) return;
 
     this.tarjetaService.EliminarTarjeta(tarjeta.id).subscribe({
       next: () => {
         if (this.tarjetaSeleccionada()?.id === tarjeta.id) {
           this.cancelarEdicion();
         }
+        this.cancelarEliminacion();
         this.cargarTarjetas();
       },
-      error: (error: unknown) => console.error('Error al eliminar la tarjeta de producción:', error),
+      error: (error: unknown) => {
+        console.error('Error al eliminar la tarjeta de producción:', error);
+        this.cancelarEliminacion();
+      }
     });
   }
 
@@ -422,8 +439,9 @@ export class CrearTarjetaProduccion implements OnInit {
       procesos: this.procesoService.ObtenerProcesos(),
       operarios: this.operarioService.ObtenerOperarios(),
       asignaciones: this.procesoXTarjetaService.ObtenerProcesosTarjetaPorTarjeta(String(tarjetaId)),
+      relacionesOperarios: this.operarioXProcesoXTarjetaService.ObtenerOperarioProcesoTarjeta(),
     }).subscribe({
-      next: ({ relaciones, procesos, operarios, asignaciones }) => {
+      next: ({ relaciones, procesos, operarios, asignaciones, relacionesOperarios }) => {
         let procesosOrdenados = relaciones
           .sort((izquierda, derecha) => (izquierda.orden ?? 0) - (derecha.orden ?? 0))
           .map((relacion) => procesos.find((proceso) => proceso.id === relacion.procesoId))
@@ -435,9 +453,31 @@ export class CrearTarjetaProduccion implements OnInit {
             .filter((proceso): proceso is ProcesoModel => Boolean(proceso));
         }
 
+        // Enriquecer cada asignación con los ids de operarios asignados,
+        // priorizando los que ya vienen del backend y completando con la tabla relacional.
+        const asignacionesEnriquecidas: ProcesoXTarjetaModel[] = asignaciones.map(asignacion => {
+          // Si el backend ya trajo los operariosIds o la relación anidada con datos, usar eso
+          const yaEnriquecida =
+            (Array.isArray(asignacion.operariosIds) && asignacion.operariosIds.length > 0) ||
+            (Array.isArray(asignacion.operarioXProcesoXTarjetas) && asignacion.operarioXProcesoXTarjetas.length > 0);
+
+          if (yaEnriquecida) return asignacion;
+
+          // Buscar en la tabla relacional los operarios que corresponden a esta asignación
+          const operariosDeEstaAsignacion = relacionesOperarios
+            .filter(rel => rel.procesoXTarjetaId === asignacion.id)
+            .map(rel => rel.operarioId)
+            .filter((id): id is number => id !== undefined && id !== null);
+
+          return {
+            ...asignacion,
+            operariosIds: operariosDeEstaAsignacion,
+          };
+        });
+
         this.tarjetaModal.set(tarjeta);
         this.procesosModal.set(procesosOrdenados);
-        this.asignacionesModal.set(asignaciones);
+        this.asignacionesModal.set(asignacionesEnriquecidas);
         this.operariosModal.set(operarios);
         this.modalProcesoAbierto.set(true);
         this.guardandoProcesos.set(false);

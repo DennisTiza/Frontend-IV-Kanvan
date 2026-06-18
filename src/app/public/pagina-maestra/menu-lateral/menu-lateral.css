@@ -113,10 +113,23 @@
 }
 
 .icon {
-	font-size: 20px;
-	width: 22px;
 	display: flex;
+	align-items: center;
 	justify-content: center;
+	width: 22px;
+	min-width: 22px;
+	color: inherit;
+}
+
+/* ::ng-deep es necesario para que los estilos lleguen a SVGs inyectados con [innerHTML] */
+:host ::ng-deep .icon svg {
+	display: block;
+	width: 20px;
+	height: 20px;
+	stroke: currentColor;
+	fill: none;
+	flex-shrink: 0;
+	overflow: visible;
 }
 
 .menu-item:hover,

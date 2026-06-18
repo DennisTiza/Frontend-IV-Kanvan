@@ -4,10 +4,11 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ConfiguracionPaginacion } from '../../../../config/configuracion.paginacion';
 import { OperarioModel } from '../../../../models/operario.model';
 import { OperarioService } from '../../../../services/parametros/operario.service';
+import { ConfirmModalComponent } from '../../../../shared/components/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-crear-operario',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ConfirmModalComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './crear-operario.html',
   styleUrl: './crear-operario.css',
@@ -21,6 +22,9 @@ export class CrearOperario implements OnInit {
   readonly paginaActual = signal(1);
   readonly operarioSeleccionado = signal<OperarioModel | null>(null);
   readonly filtroBusqueda = signal('');
+
+  readonly mostrarConfirmacionEliminar = signal(false);
+  readonly operarioAEliminar = signal<OperarioModel | null>(null);
 
   readonly operarioForm = this.fb.group({
     nombre: ['', [Validators.required]],
@@ -128,21 +132,32 @@ export class CrearOperario implements OnInit {
 
   eliminarOperario(operario: OperarioModel): void {
     if (!operario.id) return;
+    this.operarioAEliminar.set(operario);
+    this.mostrarConfirmacionEliminar.set(true);
+  }
 
-    if (confirm('¿Está seguro de eliminar este operario?')) {
-      this.operarioService.EliminarOperario(String(operario.id)).subscribe({
-        next: () => {
-          if (this.operarioSeleccionado()?.id === operario.id) {
-            this.cancelar();
-          }
-          this.cargarOperarios();
-        },
-        error: (err) => {
-          console.error('Error al eliminar el operario:', err);
-          alert('No se pudo eliminar el operario.');
-        },
-      });
-    }
+  cancelarEliminacion(): void {
+    this.operarioAEliminar.set(null);
+    this.mostrarConfirmacionEliminar.set(false);
+  }
+
+  confirmarEliminacion(): void {
+    const operario = this.operarioAEliminar();
+    if (!operario?.id) return;
+
+    this.operarioService.EliminarOperario(String(operario.id)).subscribe({
+      next: () => {
+        if (this.operarioSeleccionado()?.id === operario.id) {
+          this.cancelar();
+        }
+        this.cancelarEliminacion();
+        this.cargarOperarios();
+      },
+      error: (err) => {
+        console.error('Error al eliminar el operario:', err);
+        this.cancelarEliminacion();
+      },
+    });
   }
 
   cambiarPagina(pagina: number): void {

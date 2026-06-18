@@ -179,4 +179,13 @@
 		[tarjetaId]="tarjetaModal()?.id ?? null" [procesos]="procesosModal()" [asignaciones]="asignacionesModal()"
 		[operarios]="operariosModal()" [cargando]="guardandoProcesos()" (cerrar)="cerrarModalProcesos()"
 		(guardar)="guardarProcesosTarjeta($event)"></app-editar-proceso-produccion>
+
+	@if (mostrarConfirmacionEliminar()) {
+	<app-confirm-modal
+		titulo="Eliminar Tarjeta de Producción"
+		mensaje="¿Estás seguro de que deseas eliminar esta tarjeta de producción? Esta acción no se puede deshacer."
+		(confirmar)="confirmarEliminacion()"
+		(cancelar)="cancelarEliminacion()">
+	</app-confirm-modal>
+	}
 </div>
