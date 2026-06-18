@@ -61,5 +61,11 @@ export namespace ConfiguracionMenu {
             accion: "Guardar",
             icono: iconos['operarios'],
         },
+        {
+            id: "10",
+            titulo: "Reportes",
+            ruta: "/parametros/reportes",
+            accion: "Listar"
+        },
     ];
 }

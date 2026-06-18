@@ -1,0 +1,195 @@
+<div class="reportes-container">
+  <nav class="tabs-nav">
+    @for (tab of tabs; track tab.id) {
+      <button
+        class="tab-btn"
+        [class.active]="tabActiva() === tab.id"
+        (click)="seleccionarTab(tab.id)"
+      >
+        {{ tab.label }}
+      </button>
+    }
+  </nav>
+
+  <section class="tab-content">
+    @switch (tabActiva()) {
+      @case ('total-por-dia') {
+        <div class="report-section">
+          <div class="section-header">
+            <h2>Total Producido por Día</h2>
+            <button class="toggle-btn" (click)="alternarVista('total-por-dia')">
+              {{ mostrarTabla()['total-por-dia'] ? 'Ver Gráfico' : 'Ver Datos' }}
+            </button>
+          </div>
+
+          @if (errorAlCargar()['total-por-dia']; as errorMsg) {
+            <div class="error-msg">{{ errorMsg }}</div>
+          } @else if (!mostrarTabla()['total-por-dia']) {
+            <div class="chart-wrapper">
+              <canvas id="chart-total-por-dia"></canvas>
+            </div>
+          } @else {
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Total Producido</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of totalPorDiaData(); track item.fecha) {
+                    <tr>
+                      <td>{{ item.fecha }}</td>
+                      <td>{{ item.totalProducido }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+              @if (totalPorDiaData().length === 0) {
+                <p class="empty-msg">No hay datos disponibles.</p>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      @case ('por-operario') {
+        <div class="report-section">
+          <div class="section-header">
+            <h2>Producción por Operario</h2>
+            <button class="toggle-btn" (click)="alternarVista('por-operario')">
+              {{ mostrarTabla()['por-operario'] ? 'Ver Gráfico' : 'Ver Datos' }}
+            </button>
+          </div>
+
+          @if (errorAlCargar()['por-operario']; as errorMsg) {
+            <div class="error-msg">{{ errorMsg }}</div>
+          } @else if (!mostrarTabla()['por-operario']) {
+            <div class="chart-wrapper">
+              <canvas id="chart-por-operario"></canvas>
+            </div>
+          } @else {
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Operario</th>
+                    <th>Proceso</th>
+                    <th>Total Producido</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of porOperarioData(); track $index) {
+                    <tr>
+                      <td>{{ item.operario }}</td>
+                      <td>{{ item.proceso }}</td>
+                      <td>{{ item.totalProducido }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+              @if (porOperarioData().length === 0) {
+                <p class="empty-msg">No hay datos disponibles.</p>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      @case ('tiempos') {
+        <div class="report-section">
+          <div class="section-header">
+            <h2>Comparación de Tiempos</h2>
+            <button class="toggle-btn" (click)="alternarVista('tiempos')">
+              {{ mostrarTabla()['tiempos'] ? 'Ver Gráfico' : 'Ver Datos' }}
+            </button>
+          </div>
+
+          @if (errorAlCargar()['tiempos']; as errorMsg) {
+            <div class="error-msg">{{ errorMsg }}</div>
+          } @else if (!mostrarTabla()['tiempos']) {
+            <div class="chart-wrapper">
+              <canvas id="chart-tiempos"></canvas>
+            </div>
+          } @else {
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Tarjeta</th>
+                    <th>Proceso</th>
+                    <th>T. Estándar</th>
+                    <th>T. Real</th>
+                    <th>Diferencia</th>
+                    <th>%</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of tiemposData(); track item.tarjetaCodigo) {
+                    <tr>
+                      <td>{{ item.tarjetaCodigo }}</td>
+                      <td>{{ item.proceso }}</td>
+                      <td>{{ segundosAHHMMSS(item.tiempoEstandar) }}</td>
+                      <td>{{ segundosAHHMMSS(item.tiempoReal) }}</td>
+                      <td>{{ segundosAHHMMSS(item.diferencia) }}</td>
+                      <td>{{ item.porcentaje }}%</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+              @if (tiemposData().length === 0) {
+                <p class="empty-msg">No hay datos disponibles.</p>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      @case ('paradas') {
+        <div class="report-section">
+          <div class="section-header">
+            <h2>Reporte de Paradas</h2>
+            <button class="toggle-btn" (click)="alternarVista('paradas')">
+              {{ mostrarTabla()['paradas'] ? 'Ver Gráfico' : 'Ver Datos' }}
+            </button>
+          </div>
+
+          @if (errorAlCargar()['paradas']; as errorMsg) {
+            <div class="error-msg">{{ errorMsg }}</div>
+          } @else if (!mostrarTabla()['paradas']) {
+            <div class="chart-wrapper">
+              <canvas id="chart-paradas"></canvas>
+            </div>
+          } @else {
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Descripción</th>
+                    <th>Veces</th>
+                    <th>Cantidad Perdida</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of paradasData(); track item.codigo) {
+                    <tr>
+                      <td>{{ item.codigo }}</td>
+                      <td>{{ item.descripcion }}</td>
+                      <td>{{ item.veces }}</td>
+                      <td>{{ item.cantidadPerdida }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+              @if (paradasData().length === 0) {
+                <p class="empty-msg">No hay datos disponibles.</p>
+              }
+            </div>
+          }
+        </div>
+      }
+    }
+  </section>
+</div>
