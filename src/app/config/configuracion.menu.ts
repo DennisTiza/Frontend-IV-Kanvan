@@ -42,5 +42,11 @@ export namespace ConfiguracionMenu {
             ruta: "/parametros/operario/crear-operario",
             accion: "Guardar"
         },
+        {
+            id: "10",
+            titulo: "Reportes",
+            ruta: "/parametros/reportes",
+            accion: "Listar"
+        },
     ];
 }

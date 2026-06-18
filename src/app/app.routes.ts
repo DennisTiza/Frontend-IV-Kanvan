@@ -11,6 +11,7 @@ import { CrearTarjetaProduccion } from './modules/parametros/tarjeta-produccion/
 import { KanbanBoardComponent } from './modules/parametros/tarjeta-produccion/kanban-board/kanban-board';
 import { CrearCodigo } from './modules/parametros/codigos-de-parada/crear-codigo/crear-codigo';
 import { CrearOperario } from './modules/parametros/operario/crear-operario/crear-operario';
+import { Reportes } from './modules/reportes/reportes';
 
 export const routes: Routes = [
     {
@@ -61,6 +62,11 @@ export const routes: Routes = [
     {
         path: 'parametros/operario/crear-operario',
         component: CrearOperario,
+        canActivate: [ValidarSesionActivaGuard, guardarUltimaRutaGuard]
+    },
+    {
+        path: 'parametros/reportes',
+        component: Reportes,
         canActivate: [ValidarSesionActivaGuard, guardarUltimaRutaGuard]
     },
     {
